@@ -1,0 +1,9 @@
+ignore-bin-package: true
+ignores: [
+    '@types/chrome',
+    '@types/firefox-webext-browser'
+    'css-loader',
+    'sass-loader',
+    'style-loader',
+    'ts-loader',
+]

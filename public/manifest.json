@@ -1,0 +1,65 @@
+{
+    "manifest_version": 3,
+    "name": "LinkAce+",
+    "version": "0.0.2",
+    "description": "A better firefox extension for LinkAce (https://linkace.org).",
+    "homepage_url": "https://github.com/prplecake/linkace-firefox",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{7a18b5bd-cc39-4f19-8a3d-d4666c1263b9}",
+            "strict_min_version": "109.0"
+        }
+    },
+    "icons": {
+        "48": "images/linkace.svg",
+        "96": "images/linkace.svg"
+    },
+    "host_permissions": [
+        "*://*/*"
+    ],
+    "permissions": [
+        "storage",
+        "tabs"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["http://*/*", "https://*/*"],
+            "run_at": "document_start",
+            "js": ["description.bundle.js"],
+            "all_frames": true
+        }
+    ],
+    "action": {
+        "default_title": "LinkAce+",
+        "default_icon": {
+            "18": "images/linkace.svg",
+            "32": "images/linkace.svg",
+            "36": "images/linkace.svg",
+            "64": "images/linkace.svg"
+        },
+        "default_popup": "popup.html"
+    },
+    "page_action": {
+        "default_title": "LinkAce+",
+        "default_icon": {
+            "18": "images/linkace.svg",
+            "32": "images/linkace.svg",
+            "36": "images/linkace.svg",
+            "64": "images/linkace.svg"
+        },
+        "default_popup": "popup.html"
+    },
+    "options_ui": {
+        "page": "options.html"
+    },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Alt+P"
+            }
+        }
+    },
+    "background": {
+        "scripts": ["background.bundle.js"]
+    }
+}

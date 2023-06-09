@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>LinkAce+</title>
+</head>
+
+<body>
+    <div id="wrapper">
+
+    <div id="login-window">
+        <div id="header">
+            <div class="logo-unlogin">LinkAce - please login</div>
+        </div>
+        <form id="login-form">
+            <ul>
+                <li id="login-error">
+                    <span>Login Failed.</span>
+                </li>
+                <li>
+                    <label for="linkAceUrl" class="item-title">LinkAce URL</label>
+                    <input id="linkAceUrl" name="url" type="text" size="35" placeholder="https://links.example.com" />
+                </li>
+                <li>
+                    <label for="token" class="item-title">API Token</label>
+                    <input id="token" name="token" type="text" size="50" placeholder="API Token"/>
+                    <div class="meta clear">
+                        You can find API token in your
+                        <a class="link" id="linkAceSettingsUrl" title="LinkAce settings"
+                           >LinkAce settings</a>.
+                    </div>
+                </li>
+                <li>
+                    <input id="login-btn" type="submit" value="save" />
+                </li>
+            </ul>
+        </form>
+    </div>
+
+    <div id="bookmark-window">
+        <div id="header">
+            <div class="logo">
+                <a id="logo-link" class="link" title="Click to open LinkAce">
+                    LinkAce
+                </a> -
+                <a class="option" href="#" title="Options">Options</a>
+            </div>
+            <div class="alert alert-error" style="display: none;"></div>
+            <div class="alert alert-savetime" style="display: none;"></div>
+            <div class="logout">[<a href="#">log out</a>]</div>
+        </div>
+        <form id="add-post-form">
+            <ul>
+                <li>
+                    <label for="url" class="item-title">URL</label>
+                    <input id="url" type="text" value="" />
+                </li>
+                <li>
+                    <label for="title" class="item-title">Title</label>
+                    <input id="title" type="text" value="" />
+                </li>
+                <li>
+                    <label for="desc" class="item-title">Description</label>
+                    <textarea id="desc" rows="4"></textarea>
+                </li>
+                <li>
+                    <label for="list" class="item-title">Lists</label>
+                    <input id="list" type="text" autofocus="autofocus" autocomplete="off" />
+                </li>
+                <li>
+                    <label for="tag" class="item-title">Tags</label>
+                    <input id="tag" type="text" autofocus="autofocus" autocomplete="off" />
+                </li>
+                <li id="suggest-list" style="display: none;">
+                    <label for="suggest" class="item-title">Suggest</label>
+                    <div id="suggest"></div>
+                </li>
+                <li class="nomargin">
+                    <label class="item-title"></label>
+                    <input type="checkbox" name="private" id="private" />
+                    <label for="private">private</label>
+                </li>
+                <li class="nomargin">
+                    <label class="item-title"></label>
+                    <input id="submit" type="submit" value="Submit" />
+                    <span>
+                        <a id="opt-delete" class="opt" href="#" style="display: none;">delete</a>
+                        <span id="opt-confirm" style="display: none;">
+                            <a id="opt-cancel-delete" class="opt" href="#">cancel</a> /
+                            <a id="opt-destroy" href="#" class="opt opt-destroy">destroy</a>
+                        </span>
+                    </span>
+                </li>
+            </ul>
+        </form>
+    </div>
+
+    <div id="state-mask"></div>
+
+    <div id="auto-complete">
+        <ul></ul>
+    </div>
+    </div>
+</body>
+</html>

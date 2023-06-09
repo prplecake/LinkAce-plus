@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>LinkAce+ Options</title>
+</head>
+<body>
+    <header>
+        <h1>
+            LinkAce+ Options
+        </h1>
+    </header>
+    <section>
+        <p>
+            <label for="linkace_url">LinkAce URL</label>
+            <span><input type="text" id="linkace_url"/></span>
+        </p>
+        <p>
+            <label for="api_token">LinkAce API Token</label>
+            <span><input type="text" id="api_token"/></span>
+        </p>
+        <p>
+            <span class="checkbox"><input type="checkbox" id="no_ping" /></span>
+            <label for="no_ping">Do not check if page has already been bookmarked</label>
+            <span class="meta">
+                (Stop pinging the LinkAce API; Icon will be grey)
+            </span>
+        </p>
+        <p>
+            <span class="checkbox"><input type="checkbox" id="all_private" /></span>
+            <label for="all_private">Private checkbox checked by default</label>
+        </p>
+        <p>
+            <span class="checkbox"><input type="checkbox" id="no_page_action" /></span>
+            <label for="no_page_action">Do not show icon inside location URL bar</label>
+            <span class="meta">
+                (Restart extension to apply changes)
+            </span>
+        </p>
+    </section>
+</body>
+</html>
