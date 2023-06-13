@@ -1,0 +1,49 @@
+name: Node Release
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  release:
+    name: "Build and Release"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Install npm"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 17
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: yarn install
+      - name: Build and Pack
+        run: |
+          yarn run build
+          pushd dist
+          zip -r ../LinkAce+-${{ github.ref_name }}.zip ./*
+          popd
+      - name: "Release"
+        uses: softprops/action-gh-release@v1
+        with:
+          files: LinkAce+-*.zip
