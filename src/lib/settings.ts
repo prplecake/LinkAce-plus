@@ -1,7 +1,7 @@
 import browser, { Storage } from 'webextension-polyfill';
 
 import * as messageUtil from './messageUtil';
-import {SettingsSignature, SettingsTypeMap} from "./settingsSignature";
+import {SettingsSignature, SettingsTypeMap} from './settingsSignature';
 
 type Callback = () => void;
 
@@ -9,8 +9,8 @@ type SettingsValue = string | boolean | number;
 type SettingsMap = { [s: string]: SettingsValue };
 
 const defaultSettings: SettingsMap = {
-  "setPrivate": false,
-  "disableChecks": false,
+  'setPrivate': false,
+  'disableChecks': false,
 };
 
 class Settings {
