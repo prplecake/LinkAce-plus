@@ -3,11 +3,12 @@ import {mainPath, StorageKeys} from './common';
 import Tab = browser.tabs.Tab;
 import {PageInfo, UserInfo} from './models/Scope';
 import {Link} from './models/LinkAce/Link';
+import {validProto} from './lib/utils';
 
 declare let window: any;
 
-let pages: { [id: string]: any } = {},
-  _userInfo: UserInfo;
+const pages: { [id: string]: any } = {};
+let _userInfo: UserInfo;
 
 const login = async (obj: { url: string, token: string }) => {
   console.log(obj);
@@ -178,7 +179,7 @@ browser.tabs.query({active: true, currentWindow: true})
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
   if (changeInfo.url) {
     const url = changeInfo.url;
-    if (!pages.hasOwnProperty(url)) {
+    if (!pages.hasOwn(url)) {
       console.log('query tab pin state on updated');
       attemptPageAction(tab);
       setPageInfo(tab);
@@ -193,7 +194,7 @@ browser.tabs.onActivated.addListener((activeInfo) => {
     .then((tabs) => {
       const tab = tabs[0];
       const url = tab.url as string;
-      if (!pages.hasOwnProperty(url)) {
+      if (!pages.hasOwn(url)) {
         console.log('query tab pin state on activated');
         attemptPageAction(tab);
         setPageInfo(tab);
@@ -201,24 +202,13 @@ browser.tabs.onActivated.addListener((activeInfo) => {
     });
 });
 
-const validProto = (tab: Tab) => {
-  const url = tab.url!;
-  return (
-    (
-      url.indexOf('http://') !== -1 ||
-      url.indexOf('https://') !== -1 ||
-      url.indexOf('ftp://') !== -1
-    )
-  );
-};
-
 /*
 Attempt to create a page action on this tab.
 Do not show if options checkbox is checked or this is an invalid tab.
 */
 const attemptPageAction = (tab: Tab) => {
   browser.pageAction.hide(tab.id!);
-  if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(tab)) {
+  if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(tab.url)) {
     browser.pageAction.show(tab.id!);
   }
 };
