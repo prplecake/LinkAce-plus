@@ -1,14 +1,14 @@
 // {url: {title, desc, tag, time, isSaved, isSaving}}
-import {mainPath, StorageKeys} from "./common";
+import {mainPath, StorageKeys} from './common';
 import Tab = browser.tabs.Tab;
-import {PageInfo, UserInfo} from "./models/Scope";
-import {Link} from "./models/LinkAce/Link";
-import {validProto} from "./lib/utils";
+import {PageInfo, UserInfo} from './models/Scope';
+import {Link} from './models/LinkAce/Link';
+import {validProto} from './lib/utils';
 
-declare var window: any;
+declare let window: any;
 
-let pages: { [id: string]: any } = {},
-  _userInfo: UserInfo;
+const pages: { [id: string]: any } = {};
+let _userInfo: UserInfo;
 
 const login = async (obj: { url: string, token: string }) => {
   console.log(obj);
@@ -19,12 +19,12 @@ const login = async (obj: { url: string, token: string }) => {
     headers: new Headers({
       Authorization: `Bearer ${obj.token}`
     })
-  }
+  };
   fetch(path, options)
     .then(response => {
       if (response.ok) {
         console.log(response);
-        _userInfo.isChecked = true
+        _userInfo.isChecked = true;
         localStorage[StorageKeys.Url] = obj.url;
         localStorage[StorageKeys.ApiToken] = obj.token;
         localStorage[StorageKeys.UInfoChecked] = true;
@@ -54,7 +54,7 @@ const logout = () => {
   localStorage.removeItem(StorageKeys.ApiToken);
   localStorage.removeItem(StorageKeys.Url);
   browser.runtime.sendMessage({
-    type: "logged-out"
+    type: 'logged-out'
   });
 };
 window.logout = logout;
@@ -93,7 +93,7 @@ const getPageInfo = (url: string) => {
   console.log('pageInfo: ', pageInfo);
   if (pageInfo) {
     browser.runtime.sendMessage({
-      type: "render-page-info",
+      type: 'render-page-info',
       data: pageInfo
     });
     return;
@@ -108,7 +108,7 @@ const setPageInfo = (tab: Tab) => {
     title: tab.title,
   };
   pages[tab.url!] = pageInfo;
-}
+};
 
 const addPost = (info: any) => {
   console.log('info before post: ', info);
@@ -141,14 +141,14 @@ const addPost = (info: any) => {
           pages[info.url].isSaving = false;
           console.log('pages info after saving: ', pages[info.url]);
           browser.runtime.sendMessage({
-            type: "addpost-succeed"
+            type: 'addpost-succeed'
           });
         } else {
           // error
           pages[info.url].isSaved = false;
           pages[info.url].isSaving = false;
           browser.runtime.sendMessage({
-            type: "addpost-failed",
+            type: 'addpost-failed',
             error: 'Add failed: ' + response
           });
         }
@@ -157,7 +157,7 @@ const addPost = (info: any) => {
         pages[info.url].isSaved = false;
         pages[info.url].isSaving = false;
         browser.runtime.sendMessage({
-          type: "addpost-failed",
+          type: 'addpost-failed',
           error: 'Add failed: ' + error
         });
       });
@@ -171,21 +171,21 @@ window.addPost = addPost;
 browser.tabs.query({active: true, currentWindow: true})
   .then((tabs) => {
     const tab = tabs[0];
-    console.log("query tab pin state on loaded");
+    console.log('query tab pin state on loaded');
     attemptPageAction(tab);
     setPageInfo(tab);
   });
 
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
   if (changeInfo.url) {
-    let url = changeInfo.url;
-    if (!pages.hasOwnProperty(url)) {
-      console.log("query tab pin state on updated");
+    const url = changeInfo.url;
+    if (!pages.hasOwn(url)) {
+      console.log('query tab pin state on updated');
       attemptPageAction(tab);
       setPageInfo(tab);
     }
   }
-  console.log("set tab pin state on opening");
+  console.log('set tab pin state on opening');
   attemptPageAction(tab);
 });
 
@@ -194,8 +194,8 @@ browser.tabs.onActivated.addListener((activeInfo) => {
     .then((tabs) => {
       const tab = tabs[0];
       const url = tab.url as string;
-      if (!pages.hasOwnProperty(url)) {
-        console.log("query tab pin state on activated");
+      if (!pages.hasOwn(url)) {
+        console.log('query tab pin state on activated');
         attemptPageAction(tab);
         setPageInfo(tab);
       }
@@ -211,4 +211,4 @@ const attemptPageAction = (tab: Tab) => {
   if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(tab.url)) {
     browser.pageAction.show(tab.id!);
   }
-}
+};

@@ -48,7 +48,7 @@ export function sendToAllTabs(name: string, params: any) {
         const { id } = tab;
         if (id) browser.tabs.sendMessage(id, data);
       }
-    })
+    });
   }
 }
 

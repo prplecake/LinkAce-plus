@@ -2,7 +2,7 @@ console.log('description page');
 
 browser.runtime.onMessage.addListener(
   function (message, sender, sendResponse) {
-    console.log("receive message: " + JSON.stringify(message))
+    console.log('receive message: ' + JSON.stringify(message));
     if (message.method == 'getDescription') {
       let description = (window.getSelection() || '').toString();
       if (!description || description == '') {

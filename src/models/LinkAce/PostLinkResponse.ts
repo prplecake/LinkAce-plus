@@ -1,6 +1,6 @@
-import {LinkStatus} from "./LinkStatus";
-import {List} from "./List";
-import {Tag} from "./Tag";
+import {LinkStatus} from './LinkStatus';
+import {List} from './List';
+import {Tag} from './Tag';
 
 export interface PostLinkResponse {
   id: number;

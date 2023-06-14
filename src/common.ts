@@ -1,10 +1,10 @@
-const StorageKeyPrefix = "lauinfo_";
+const StorageKeyPrefix = 'lauinfo_';
 export enum StorageKeys {
-  Url = StorageKeyPrefix + "url",
-  ApiToken = StorageKeyPrefix + "token",
-  UInfoChecked = StorageKeyPrefix + "checked",
-  AllPrivate = StorageKeyPrefix + "all_private",
-  NoPageAction = StorageKeyPrefix + "page_action",
+  Url = StorageKeyPrefix + 'url',
+  ApiToken = StorageKeyPrefix + 'token',
+  UInfoChecked = StorageKeyPrefix + 'checked',
+  AllPrivate = StorageKeyPrefix + 'all_private',
+  NoPageAction = StorageKeyPrefix + 'page_action',
 }
 
 /**
