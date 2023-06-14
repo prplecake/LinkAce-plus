@@ -1,6 +1,6 @@
 export interface SettingsTypeMap {
-  "setPrivate": boolean;
-  "disableChecks": boolean;
+  'setPrivate': boolean;
+  'disableChecks': boolean;
 }
 
 export type SettingsSignature = { [K in keyof SettingsTypeMap]: SettingsTypeMap[K] };
