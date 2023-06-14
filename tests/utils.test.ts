@@ -13,9 +13,9 @@ describe('testing validProto', () => {
   });
   test('undefined returns false', () => {
     const undef = undefined;
-    expect(validProto(undef)).toBeFalsy();
+    expect(validProto(undef)).toBe(false);
   });
   test('null returns false', () => {
-    expect(validProto(null!)).toBeFalsy();
+    expect(validProto(null!)).toBe(false);
   });
 });
