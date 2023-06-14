@@ -1,4 +1,4 @@
-import {validProto} from '../src/lib/utils';
+import {validProto} from '../../src/lib/utils';
 
 
 describe('testing validProto', () => {
