@@ -535,7 +535,7 @@ $(".link").on("click", function () {
   return false;
 });
 
-$(".option").off("click").on("click", function () {
+$("#option-link").off("click").on("click", function () {
   browser.runtime.openOptionsPage();
 });
 
