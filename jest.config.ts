@@ -9,7 +9,10 @@ const config: Config = {
         }]
     },
     testEnvironment: 'node',
-    testRegex: '/tests/.*\\.(test|spec)?\\.ts$',
+    testMatch: [
+      '**/tests/**/*.[jt]s?(x)',
+      '**/?(*.)+(test|spec).[jt]s?(x)'
+    ],
     moduleFileExtensions: ['ts', 'js', 'json', 'node']
 };
 
