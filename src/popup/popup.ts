@@ -518,7 +518,7 @@ const postDelete = () => {
     });
 };
 
-$("#linkAceUrl").on("keyup", () => {
+$("#linkAceUrl").on("input", () => {
   let val = $("#linkAceUrl").val()
   console.log(val);
   $('#linkAceSettingsUrl').attr('href', `${val}/settings`);
