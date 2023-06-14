@@ -3,6 +3,7 @@ import {mainPath, StorageKeys} from "./common";
 import Tab = browser.tabs.Tab;
 import {PageInfo, UserInfo} from "./models/Scope";
 import {Link} from "./models/LinkAce/Link";
+import {validProto} from "./lib/utils";
 
 declare var window: any;
 
@@ -201,24 +202,13 @@ browser.tabs.onActivated.addListener((activeInfo) => {
     });
 });
 
-const validProto = (tab: Tab) => {
-  const url = tab.url!;
-  return (
-    (
-      url.indexOf("http://") !== -1 ||
-      url.indexOf("https://") !== -1 ||
-      url.indexOf('ftp://') !== -1
-    )
-  );
-}
-
 /*
 Attempt to create a page action on this tab.
 Do not show if options checkbox is checked or this is an invalid tab.
 */
 const attemptPageAction = (tab: Tab) => {
   browser.pageAction.hide(tab.id!);
-  if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(tab)) {
+  if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(tab.url)) {
     browser.pageAction.show(tab.id!);
   }
 }
