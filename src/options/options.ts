@@ -1,6 +1,6 @@
 import {byId} from '../lib/htmlUtils';
 import './options.scss';
-import {StorageKeys} from "../common";
+import {StorageKeys} from '../common';
 
 const input: { [s: string]: { storageKey: string, element: HTMLInputElement } } = {
   api_token: {
@@ -22,7 +22,7 @@ const input: { [s: string]: { storageKey: string, element: HTMLInputElement } } 
 };
 
 for (const [key, value] of Object.entries(input)) {
-  value.element.addEventListener("change", (e) => {
+  value.element.addEventListener('change', (e) => {
     console.log(e);
     console.log(key, value);
     if (value.element.type === 'checkbox') {
@@ -30,10 +30,10 @@ for (const [key, value] of Object.entries(input)) {
     } else {
       localStorage[value.storageKey] = value.element.value;
     }
-  })
+  });
 }
 
-window.addEventListener("load", (e) => {
+window.addEventListener('load', (e) => {
   console.log(e);
   for (const [key, value] of Object.entries(input)) {
     if (value.element.type === 'checkbox') {
