@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import {byId} from '../lib/htmlUtils';
 import './options.scss';
 import {StorageKeys} from "../common";
@@ -27,9 +26,9 @@ for (const [key, value] of Object.entries(input)) {
     console.log(e);
     console.log(key, value);
     if (value.element.type === 'checkbox') {
-      localStorage[value.storageKey] = $(value.element).prop('checked');
+      localStorage[value.storageKey] = value.element.checked;
     } else {
-      localStorage[value.storageKey] = $(value.element).val();
+      localStorage[value.storageKey] = value.element.value;
     }
   })
 }
@@ -38,9 +37,9 @@ window.addEventListener("load", (e) => {
   console.log(e);
   for (const [key, value] of Object.entries(input)) {
     if (value.element.type === 'checkbox') {
-      $(value.element).prop('checked', localStorage[value.storageKey] === 'true')
+      value.element.checked = localStorage[value.storageKey] === 'true';
     } else {
-      $(value.element).val(localStorage[value.storageKey]);
+      value.element.value = localStorage[value.storageKey];
     }
   }
 });
