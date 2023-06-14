@@ -10,10 +10,8 @@ export const show = (elem: HTMLElement | null) => {
   if (elem) elem.style.display = 'unset';
 };
 
-export const on = <T extends keyof HTMLElementEventMap>(
-  node: Node,
-  event: T,
-  callback: (this: HTMLInputElement, ev: HTMLElementEventMap[T]) => any
-) => {
+export const on = <T extends keyof HTMLElementEventMap>(node: Node, event: T, callback: (this: HTMLInputElement,
+                                                                                         ev: HTMLElementEventMap[T]
+) => any) => {
   node.addEventListener(event, callback as EventListener);
 };

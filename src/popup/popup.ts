@@ -5,8 +5,8 @@ import './popup.scss';
 import {byId, hide, show} from "../lib/htmlUtils";
 
 const bg: any = browser.extension.getBackgroundPage(),
-  keyCode = {enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32},
-  SEC = 1000, MIN = SEC * 60, HOUR = MIN * 60, DAY = HOUR * 24, WEEK = DAY * 7;
+  keyCode = {enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32}, SEC = 1000, MIN = SEC * 60,
+  HOUR = MIN * 60, DAY = HOUR * 24, WEEK = DAY * 7;
 
 // request permissions
 const requestPermissions = async (url: string) => {
@@ -33,8 +33,7 @@ const escapeHTML = function (str: string) {
 };
 
 const getTimePassed = function (date: Date) {
-  const ret = {week: 0, day: 0, hour: 0, min: 0, sec: 0, offset: -1},
-    offset = new Date().getTime() - date.getTime();
+  const ret = {week: 0, day: 0, hour: 0, min: 0, sec: 0, offset: -1}, offset = new Date().getTime() - date.getTime();
   let r;
   if (offset <= 0) return ret;
   ret.offset = offset;
@@ -67,9 +66,7 @@ const renderSavedTime = function (time: number) {
 };
 
 const $scope: Scope = {
-  loadingText: 'Loading...',
-  userInfo: {},
-  pageInfo: {}
+  loadingText: 'Loading...', userInfo: {}, pageInfo: {}
 };
 
 const $loading = byId('state-mask');
@@ -79,11 +76,7 @@ const $postform = byId('add-post-form');
 const $autocomplete = byId('auto-complete');
 
 [
-  $loading,
-  $login,
-  $bookmark,
-  $postform,
-  $autocomplete
+  $loading, $login, $bookmark, $postform, $autocomplete
 ].forEach(elem => {
   if (elem) elem.style.display = 'none';
 });
@@ -152,10 +145,7 @@ browser.runtime.onMessage.addListener((message: any) => {
           let pageInfo: PageInfo = message.data;
           if (pageInfo.isSaved == false) {
             pageInfo = {
-              url: tab.url,
-              title: tab.title,
-              tag: '',
-              desc: ''
+              url: tab.url, title: tab.title, tag: '', desc: ''
             };
             pageInfo.shared = (localStorage[StorageKeys.AllPrivate] !== 'true');
             pageInfo.isSaved = false;
@@ -172,24 +162,20 @@ browser.runtime.onMessage.addListener((message: any) => {
           console.log('desc: ', pageInfo.desc);
           if (!pageInfo.desc) {
             // TODO: resolve dependency on chrome
-            chrome.tabs.sendMessage(
-              tab.id as number, {
-                method: 'getDescription'
-              },
-              function (response) {
-                console.log(response);
-                if (typeof response !== 'undefined' &&
-                  response.data.length !== 0) {
-                  let desc = response.data;
-                  console.log('desc: ', desc);
-                  if (desc.length > maxDescLen) {
-                    desc = desc.slice(0, maxDescLen) + '...';
-                  }
-                  pageInfo.desc = desc;
-                  (byId('desc') as HTMLInputElement).value = pageInfo.desc as string;
+            chrome.tabs.sendMessage(tab.id as number, {
+              method: 'getDescription'
+            }, function (response) {
+              console.log(response);
+              if (typeof response !== 'undefined' && response.data.length !== 0) {
+                let desc = response.data;
+                console.log('desc: ', desc);
+                if (desc.length > maxDescLen) {
+                  desc = desc.slice(0, maxDescLen) + '...';
                 }
+                pageInfo.desc = desc;
+                (byId('desc') as HTMLInputElement).value = pageInfo.desc as string;
               }
-            );
+            });
           } else {
             (byId('desc') as HTMLInputElement).value = pageInfo.desc;
           }
@@ -244,8 +230,9 @@ browser.runtime.onMessage.addListener((message: any) => {
           if ($tag) {
             $tag.addEventListener('change keyup paste', function (e) {
               const code = e.charCode ? e.charCode : e.keyCode;
-              if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
-                keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) === -1) {
+              if (code && $.inArray(code, [
+                keyCode.enter, keyCode.tab, keyCode.up, keyCode.down, keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
+              ]) === -1) {
                 $scope.pageInfo.tag = $('#tag').val() as string;
                 renderSuggest();
                 showAutoComplete();
@@ -256,10 +243,12 @@ browser.runtime.onMessage.addListener((message: any) => {
               renderSuggest();
             });
 
-            if ($postform) $postform.addEventListener('submit', function () {
-              postSubmit();
-              return false;
-            });
+            if ($postform) {
+              $postform.addEventListener('submit', function () {
+                postSubmit();
+                return false;
+              });
+            }
 
             $scope.isLoading = false;
             renderLoading();
@@ -312,13 +301,15 @@ const loginSubmit = () => {
 
 const renderPageHeader = () => {
   const $logoutLink = byId('logout-link');
-  if ($logoutLink) $logoutLink.addEventListener('click', function () {
-    console.log('log out...');
-    $scope.isLoading = true;
-    $scope.loadingText = 'Log out...';
-    renderLoading();
-    bg.logout();
-  });
+  if ($logoutLink) {
+    $logoutLink.addEventListener('click', function () {
+      console.log('log out...');
+      $scope.isLoading = true;
+      $scope.loadingText = 'Log out...';
+      renderLoading();
+      bg.logout();
+    });
+  }
 };
 
 const renderError = () => {
@@ -340,7 +331,8 @@ const renderBookmarkPage = () => {
   browser.tabs.query({active: true, currentWindow: true})
     .then((tabs) => {
       const tab = tabs[0];
-      if (tab.url && tab.url.indexOf('http://') !== 0 && tab.url.indexOf('https://') !== 0 && tab.url.indexOf('ftp://') !== 0) {
+      if (tab.url && tab.url.indexOf('http://') !== 0 && tab.url.indexOf('https://') !== 0 && tab.url.indexOf(
+        'ftp://') !== 0) {
         console.log('invalid tab');
         $scope.loadingText = 'Please select a valid tab';
         $scope.isLoading = true;
@@ -360,14 +352,14 @@ const chooseTag = (e: KeyDownEvent) => {
   let newItems;
   let idx;
   const code = e.charCode ? e.charCode : e.keyCode;
-  if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
-    keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) !== -1) {
+  if (code && $.inArray(code, [
+    keyCode.enter, keyCode.tab, keyCode.up, keyCode.down, keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
+  ]) !== -1) {
     if (code == keyCode.enter || code == keyCode.tab) {
       if ($scope.isShowAutoComplete) {
         e.preventDefault();
         // submit tag
-        const items = $scope.pageInfo.tag.split(' '),
-          tag = $scope.autoCompleteItems[$scope.activeItemIndex];
+        const items = $scope.pageInfo.tag.split(' '), tag = $scope.autoCompleteItems[$scope.activeItemIndex];
         items.splice(items.length - 1, 1, tag.text);
         $scope.pageInfo.tag = items.join(' ') + ' ';
         $('#tag').val($scope.pageInfo.tag);
@@ -377,8 +369,7 @@ const chooseTag = (e: KeyDownEvent) => {
         postSubmit();
         return false;
       }
-    } else if (code == keyCode.down ||
-      (code == keyCode.n && e.ctrlKey)) {
+    } else if (code == keyCode.down || (code == keyCode.n && e.ctrlKey)) {
       // move up one item
       e.preventDefault();
       idx = $scope.activeItemIndex + 1;
@@ -392,8 +383,7 @@ const chooseTag = (e: KeyDownEvent) => {
       $scope.activeItemIndex = idx;
       $scope.autoCompleteItems[idx].isActive = true;
       renderAutoComplete();
-    } else if (code == keyCode.up ||
-      (code == keyCode.p && e.ctrlKey)) {
+    } else if (code == keyCode.up || (code == keyCode.p && e.ctrlKey)) {
       // move down one item
       e.preventDefault();
       idx = $scope.activeItemIndex - 1;
@@ -438,8 +428,7 @@ const showAutoComplete = () => {
       $scope.autoCompleteItems[0].isActive = true;
       $scope.activeItemIndex = 0;
       $scope.isShowAutoComplete = true;
-      const tagEl = $('#tag'),
-        pos = $('#tag').offset();
+      const tagEl = $('#tag'), pos = $('#tag').offset();
       pos.top = pos.top + tagEl.outerHeight();
       $autocomplete.css({'left': pos.left, 'top': pos.top});
     } else {

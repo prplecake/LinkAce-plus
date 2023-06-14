@@ -4,20 +4,13 @@ import {StorageKeys} from '../common';
 
 const input: { [s: string]: { storageKey: string, element: HTMLInputElement } } = {
   api_token: {
-    storageKey: StorageKeys.ApiToken,
-    element: byId('api_token') as HTMLInputElement
-  },
-  linkace_url: {
-    storageKey: StorageKeys.Url,
-    element: byId('linkace_url') as HTMLInputElement
-  },
-  all_private: {
-    storageKey: StorageKeys.AllPrivate,
-    element: byId('all_private') as HTMLInputElement
-  },
-  no_page_action: {
-    storageKey: StorageKeys.NoPageAction,
-    element: byId('no_page_action') as HTMLInputElement
+    storageKey: StorageKeys.ApiToken, element: byId('api_token') as HTMLInputElement
+  }, linkace_url: {
+    storageKey: StorageKeys.Url, element: byId('linkace_url') as HTMLInputElement
+  }, all_private: {
+    storageKey: StorageKeys.AllPrivate, element: byId('all_private') as HTMLInputElement
+  }, no_page_action: {
+    storageKey: StorageKeys.NoPageAction, element: byId('no_page_action') as HTMLInputElement
   },
 };
 
