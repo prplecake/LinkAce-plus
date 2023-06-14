@@ -1,0 +1,45 @@
+name: Linters
+
+on:
+  push:
+    paths-ignore:
+      - '.**'
+      - '!.github/workflows/linters.yml'
+      - '!.eslintrc.json'
+      - 'README.md'
+      - 'yarn.lock'
+      - 'package.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  eslint:
+    name: ESLint (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Get npm cache dir
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: |
+          yarn install
+      - name: Analysing the code with eslint
+        if: always()
+        run: |
+          npm run lint:js
