@@ -3,4 +3,6 @@ export interface SettingsTypeMap {
   'disableChecks': boolean;
 }
 
-export type SettingsSignature = { [K in keyof SettingsTypeMap]: SettingsTypeMap[K] };
+export type SettingsSignature = {
+  [K in keyof SettingsTypeMap]: SettingsTypeMap[K]
+};

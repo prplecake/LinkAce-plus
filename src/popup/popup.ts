@@ -4,9 +4,9 @@ import {Link} from '../models/LinkAce/Link';
 import './popup.scss';
 import {byId, hide, show} from "../lib/htmlUtils";
 
-const bg: any = browser.extension.getBackgroundPage(),
-  keyCode = {enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32}, SEC = 1000, MIN = SEC * 60,
-  HOUR = MIN * 60, DAY = HOUR * 24, WEEK = DAY * 7;
+const bg: any = browser.extension.getBackgroundPage(), keyCode = {
+  enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32
+}, SEC = 1000, MIN = SEC * 60, HOUR = MIN * 60, DAY = HOUR * 24, WEEK = DAY * 7;
 
 // request permissions
 const requestPermissions = async (url: string) => {
@@ -28,12 +28,15 @@ const requestPermissions = async (url: string) => {
 };
 
 const escapeHTML = function (str: string) {
-  const replacements: { [id: string]: string } = {'&': '&amp;', '"': '&quot;', '\'': '&#39;', '<': '&lt;', '>': '&gt;'};
+  const replacements: { [id: string]: string } = {
+    '&': '&amp;', '"': '&quot;', '\'': '&#39;', '<': '&lt;', '>': '&gt;'
+  };
   return str.replace(/[&"'<>]/g, (m) => replacements[m]);
 };
 
 const getTimePassed = function (date: Date) {
-  const ret = {week: 0, day: 0, hour: 0, min: 0, sec: 0, offset: -1}, offset = new Date().getTime() - date.getTime();
+  const ret = {week: 0, day: 0, hour: 0, min: 0, sec: 0, offset: -1},
+    offset = new Date().getTime() - date.getTime();
   let r;
   if (offset <= 0) return ret;
   ret.offset = offset;
@@ -157,7 +160,8 @@ browser.runtime.onMessage.addListener((message: any) => {
           $scope.pageInfo = Object.assign({}, pageInfo);
 
           (byId('url') as HTMLInputElement).value = (pageInfo.url as string);
-          (byId('title') as HTMLInputElement).value = (pageInfo.title as string);
+          (byId(
+            'title') as HTMLInputElement).value = (pageInfo.title as string);
           (byId('tag') as HTMLInputElement).value = (pageInfo.tag as string);
           console.log('desc: ', pageInfo.desc);
           if (!pageInfo.desc) {
@@ -166,14 +170,15 @@ browser.runtime.onMessage.addListener((message: any) => {
               method: 'getDescription'
             }, function (response) {
               console.log(response);
-              if (typeof response !== 'undefined' && response.data.length !== 0) {
+              if (response && response.data.length !== 0) {
                 let desc = response.data;
                 console.log('desc: ', desc);
                 if (desc.length > maxDescLen) {
                   desc = desc.slice(0, maxDescLen) + '...';
                 }
                 pageInfo.desc = desc;
-                (byId('desc') as HTMLInputElement).value = pageInfo.desc as string;
+                (byId(
+                  'desc') as HTMLInputElement).value = pageInfo.desc as string;
               }
             });
           } else {
@@ -231,7 +236,8 @@ browser.runtime.onMessage.addListener((message: any) => {
             $tag.addEventListener('change keyup paste', function (e) {
               const code = e.charCode ? e.charCode : e.keyCode;
               if (code && $.inArray(code, [
-                keyCode.enter, keyCode.tab, keyCode.up, keyCode.down, keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
+                keyCode.enter, keyCode.tab, keyCode.up, keyCode.down, keyCode.n,
+                keyCode.p, keyCode.ctrl, keyCode.space
               ]) === -1) {
                 $scope.pageInfo.tag = $('#tag').val() as string;
                 renderSuggest();
@@ -331,8 +337,8 @@ const renderBookmarkPage = () => {
   browser.tabs.query({active: true, currentWindow: true})
     .then((tabs) => {
       const tab = tabs[0];
-      if (tab.url && tab.url.indexOf('http://') !== 0 && tab.url.indexOf('https://') !== 0 && tab.url.indexOf(
-        'ftp://') !== 0) {
+      if (tab.url && tab.url.indexOf('http://') !== 0 && tab.url.indexOf(
+        'https://') !== 0 && tab.url.indexOf('ftp://') !== 0) {
         console.log('invalid tab');
         $scope.loadingText = 'Please select a valid tab';
         $scope.isLoading = true;
@@ -353,13 +359,15 @@ const chooseTag = (e: KeyDownEvent) => {
   let idx;
   const code = e.charCode ? e.charCode : e.keyCode;
   if (code && $.inArray(code, [
-    keyCode.enter, keyCode.tab, keyCode.up, keyCode.down, keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
+    keyCode.enter, keyCode.tab, keyCode.up, keyCode.down, keyCode.n, keyCode.p,
+    keyCode.ctrl, keyCode.space
   ]) !== -1) {
     if (code == keyCode.enter || code == keyCode.tab) {
       if ($scope.isShowAutoComplete) {
         e.preventDefault();
         // submit tag
-        const items = $scope.pageInfo.tag.split(' '), tag = $scope.autoCompleteItems[$scope.activeItemIndex];
+        const items = $scope.pageInfo.tag.split(' '),
+          tag = $scope.autoCompleteItems[$scope.activeItemIndex];
         items.splice(items.length - 1, 1, tag.text);
         $scope.pageInfo.tag = items.join(' ') + ' ';
         $('#tag').val($scope.pageInfo.tag);
@@ -448,7 +456,8 @@ const renderAutoComplete = () => {
       if (item.isActive) {
         cls = 'active';
       }
-      $('#auto-complete ul').append('<li class="' + cls + '">' + escapeHTML(item.text) + '</li>');
+      $('#auto-complete ul')
+        .append('<li class="' + cls + '">' + escapeHTML(item.text) + '</li>');
     });
     $autocomplete.show();
   } else {
@@ -464,7 +473,8 @@ const renderSuggest = () => {
       if ($scope.pageInfo.tag.split(' ').indexOf(suggest) != -1) {
         cls += ' selected';
       }
-      $('#suggest').append('<a href="#" class="' + cls + '">' + escapeHTML(suggest) + '</a>');
+      $('#suggest').append(
+        '<a href="#" class="' + cls + '">' + escapeHTML(suggest) + '</a>');
     });
     $('#suggest').append('<a href="#" class="add-all-tag">Add all</a>');
     $('.add-tag').off('click').on('click', function () {
