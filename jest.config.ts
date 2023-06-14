@@ -8,7 +8,7 @@ const config: Config = {
             tsconfig: 'tsconfig.json'
         }]
     },
-    testEnvironment: 'node',
+    testEnvironment: 'jsdom',
     testMatch: [
       '**/tests/**/*.[jt]s?(x)',
       '**/?(*.)+(test|spec).[jt]s?(x)'
