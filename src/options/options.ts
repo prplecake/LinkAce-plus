@@ -3,15 +3,21 @@ import {byId} from '../lib/htmlUtils';
 import './options.scss';
 import {StorageKeys} from '../common';
 
-const input: { [s: string]: { storageKey: string, element: HTMLInputElement } } = {
+const input: {
+  [s: string]: { storageKey: string, element: HTMLInputElement }
+} = {
   api_token: {
-    storageKey: StorageKeys.ApiToken, element: byId('api_token') as HTMLInputElement
+    storageKey: StorageKeys.ApiToken,
+    element: byId('api_token') as HTMLInputElement
   }, linkace_url: {
-    storageKey: StorageKeys.Url, element: byId('linkace_url') as HTMLInputElement
+    storageKey: StorageKeys.Url,
+    element: byId('linkace_url') as HTMLInputElement
   }, all_private: {
-    storageKey: StorageKeys.AllPrivate, element: byId('all_private') as HTMLInputElement
+    storageKey: StorageKeys.AllPrivate,
+    element: byId('all_private') as HTMLInputElement
   }, no_page_action: {
-    storageKey: StorageKeys.NoPageAction, element: byId('no_page_action') as HTMLInputElement
+    storageKey: StorageKeys.NoPageAction,
+    element: byId('no_page_action') as HTMLInputElement
   },
 };
 
@@ -31,7 +37,8 @@ window.addEventListener('load', (e) => {
   console.log(e);
   for (const [key, value] of Object.entries(input)) {
     if (value.element.type === 'checkbox') {
-      $(value.element).prop('checked', localStorage[value.storageKey] === 'true');
+      $(value.element)
+        .prop('checked', localStorage[value.storageKey] === 'true');
     } else {
       $(value.element).val(localStorage[value.storageKey]);
     }

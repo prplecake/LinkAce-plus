@@ -208,7 +208,8 @@ Do not show if options checkbox is checked or this is an invalid tab.
 */
 const attemptPageAction = (tab: Tab) => {
   browser.pageAction.hide(tab.id!);
-  if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(tab.url)) {
+  if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(
+    tab.url)) {
     browser.pageAction.show(tab.id!);
   }
 };
