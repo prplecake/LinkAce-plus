@@ -166,9 +166,9 @@ browser.runtime.onMessage.addListener((message: any) => {
           pageInfo.isPrivate = !pageInfo.shared;
           $scope.pageInfo = Object.assign({}, pageInfo);
 
-          (byId('url') as HTMLInputElement)!.value = (pageInfo.url as string);
-          (byId('title') as HTMLInputElement)!.value = (pageInfo.title as string);
-          (byId('tag') as HTMLInputElement)!.value = (pageInfo.tag as string);
+          (byId('url') as HTMLInputElement).value = (pageInfo.url as string);
+          (byId('title') as HTMLInputElement).value = (pageInfo.title as string);
+          (byId('tag') as HTMLInputElement).value = (pageInfo.tag as string);
           console.log('desc: ', pageInfo.desc);
           if (!pageInfo.desc) {
             // TODO: resolve dependency on chrome
@@ -340,7 +340,7 @@ const renderBookmarkPage = () => {
   browser.tabs.query({active: true, currentWindow: true})
     .then((tabs) => {
       const tab = tabs[0];
-      if (tab.url!.indexOf('http://') !== 0 && tab.url!.indexOf('https://') !== 0 && tab.url!.indexOf('ftp://') !== 0) {
+      if (tab.url && tab.url.indexOf('http://') !== 0 && tab.url.indexOf('https://') !== 0 && tab.url.indexOf('ftp://') !== 0) {
         console.log('invalid tab');
         $scope.loadingText = 'Please select a valid tab';
         $scope.isLoading = true;
@@ -352,7 +352,7 @@ const renderBookmarkPage = () => {
       $scope.isLoading = true;
       renderLoading();
 
-      bg.getPageInfo(tab.url!);
+      bg.getPageInfo(tab.url);
     });
 };
 
@@ -366,8 +366,8 @@ const chooseTag = (e: KeyDownEvent) => {
       if ($scope.isShowAutoComplete) {
         e.preventDefault();
         // submit tag
-        const items = $scope.pageInfo.tag!.split(' '),
-          tag = $scope.autoCompleteItems![$scope.activeItemIndex!];
+        const items = $scope.pageInfo.tag.split(' '),
+          tag = $scope.autoCompleteItems[$scope.activeItemIndex];
         items.splice(items.length - 1, 1, tag.text);
         $scope.pageInfo.tag = items.join(' ') + ' ';
         $('#tag').val($scope.pageInfo.tag);
@@ -381,11 +381,11 @@ const chooseTag = (e: KeyDownEvent) => {
       (code == keyCode.n && e.ctrlKey)) {
       // move up one item
       e.preventDefault();
-      idx = $scope.activeItemIndex! + 1;
-      if (idx >= $scope.autoCompleteItems!.length) {
+      idx = $scope.activeItemIndex + 1;
+      if (idx >= $scope.autoCompleteItems.length) {
         idx = 0;
       }
-      newItems = $scope.autoCompleteItems!.map(function (item) {
+      newItems = $scope.autoCompleteItems.map(function (item) {
         return {text: item.text, isActive: false};
       });
       $scope.autoCompleteItems = newItems;
@@ -396,11 +396,11 @@ const chooseTag = (e: KeyDownEvent) => {
       (code == keyCode.p && e.ctrlKey)) {
       // move down one item
       e.preventDefault();
-      idx = $scope.activeItemIndex! - 1;
+      idx = $scope.activeItemIndex - 1;
       if (idx < 0) {
-        idx = $scope.autoCompleteItems!.length - 1;
+        idx = $scope.autoCompleteItems.length - 1;
       }
-      newItems = $scope.autoCompleteItems!.map(function (item) {
+      newItems = $scope.autoCompleteItems.map(function (item) {
         return {text: item.text, isActive: false};
       });
       $scope.autoCompleteItems = newItems;
@@ -415,12 +415,12 @@ const chooseTag = (e: KeyDownEvent) => {
 };
 
 const showAutoComplete = () => {
-  const items = $scope.pageInfo.tag!.split(' ');
+  const items = $scope.pageInfo.tag.split(' ');
   let word = items[items.length - 1];
   const MAX_SHOWN_ITEMS = 5;
   if (word) {
     word = word.toLowerCase();
-    const allTags: string[] = $scope.allTags!;
+    const allTags: string[] = $scope.allTags;
     let shownCount = 0;
     const autoCompleteItems = [];
     let i = 0;
@@ -440,8 +440,8 @@ const showAutoComplete = () => {
       $scope.isShowAutoComplete = true;
       const tagEl = $('#tag'),
         pos = $('#tag').offset();
-      pos!.top = pos!.top + tagEl.outerHeight()!;
-      $autocomplete.css({'left': pos!.left, 'top': pos!.top});
+      pos.top = pos.top + tagEl.outerHeight();
+      $autocomplete.css({'left': pos.left, 'top': pos.top});
     } else {
       $scope.isShowAutoComplete = false;
     }
@@ -454,7 +454,7 @@ const showAutoComplete = () => {
 const renderAutoComplete = () => {
   if ($scope.isShowAutoComplete === true) {
     $('#auto-complete ul').html('');
-    $.each($scope.autoCompleteItems!, function (index, item) {
+    $.each($scope.autoCompleteItems, function (index, item) {
       let cls = '';
       if (item.isActive) {
         cls = 'active';
@@ -472,7 +472,7 @@ const renderSuggest = () => {
     $('#suggest').html('');
     $.each($scope.suggests, function (index, suggest) {
       let cls = 'add-tag';
-      if ($scope.pageInfo.tag!.split(' ').indexOf(suggest) != -1) {
+      if ($scope.pageInfo.tag.split(' ').indexOf(suggest) != -1) {
         cls += ' selected';
       }
       $('#suggest').append('<a href="#" class="' + cls + '">' + escapeHTML(suggest) + '</a>');
@@ -493,12 +493,12 @@ const renderSuggest = () => {
 };
 
 const addTag = (s: string) => {
-  const t = $scope.pageInfo.tag!.trim();
+  const t = $scope.pageInfo.tag.trim();
   // skip if tag already added
   if ($.inArray(s, t.split(' ')) === -1) {
     $scope.pageInfo.tag = t + ' ' + s + ' ';
   }
-  $('#tag').val($scope.pageInfo.tag!);
+  $('#tag').val($scope.pageInfo.tag);
 };
 
 const addTags = (tags: string[]) => {

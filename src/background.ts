@@ -103,11 +103,10 @@ window.getPageInfo = getPageInfo;
 
 const setPageInfo = (tab: Tab) => {
   // console.log('tab: ', tab);
-  const pageInfo: PageInfo = {
+  if (tab.url) pages[tab.url] = {
     url: tab.url,
     title: tab.title,
   };
-  pages[tab.url!] = pageInfo;
 };
 
 const addPost = (info: any) => {
@@ -207,8 +206,8 @@ Attempt to create a page action on this tab.
 Do not show if options checkbox is checked or this is an invalid tab.
 */
 const attemptPageAction = (tab: Tab) => {
-  browser.pageAction.hide(tab.id!);
-  if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(tab.url)) {
-    browser.pageAction.show(tab.id!);
+  if (tab.id) browser.pageAction.hide(tab.id);
+  if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(tab.url) && tab.id) {
+    browser.pageAction.show(tab.id);
   }
 };
