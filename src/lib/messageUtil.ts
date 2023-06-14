@@ -19,7 +19,8 @@ function init() {
   return result;
 }
 
-export function send(name: string, params?: any, callback?: (value: any) => any) {
+export function send(
+  name: string, params?: any, callback?: (value: any) => any) {
   const data = {
     action: name, params,
   };
@@ -50,7 +51,8 @@ export function sendToAllTabs(name: string, params: any) {
   }
 }
 
-export function sendToTab(tab: Tabs.Tab, name: string, params: any, callback?: (value: any) => any) {
+export function sendToTab(
+  tab: Tabs.Tab, name: string, params: any, callback?: (value: any) => any) {
   const data = {
     action: name, params,
   };

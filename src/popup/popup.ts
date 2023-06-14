@@ -6,7 +6,16 @@ import './popup.scss';
 import KeyDownEvent = JQuery.KeyDownEvent;
 
 const bg: any = browser.extension.getBackgroundPage(),
-  keyCode = {enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32},
+  keyCode = {
+    enter: 13,
+    tab: 9,
+    up: 38,
+    down: 40,
+    ctrl: 17,
+    n: 78,
+    p: 80,
+    space: 32
+  },
   SEC = 1000, MIN = SEC * 60, HOUR = MIN * 60, DAY = HOUR * 24, WEEK = DAY * 7;
 
 // request permissions
@@ -29,7 +38,13 @@ const requestPermissions = async (url: string) => {
 };
 
 const escapeHTML = function (str: string) {
-  const replacements: { [id: string]: string } = {'&': '&amp;', '"': '&quot;', '\'': '&#39;', '<': '&lt;', '>': '&gt;'};
+  const replacements: { [id: string]: string } = {
+    '&': '&amp;',
+    '"': '&quot;',
+    '\'': '&#39;',
+    '<': '&lt;',
+    '>': '&gt;'
+  };
   return str.replace(/[&"'<>]/g, (m) => replacements[m]);
 };
 
@@ -220,17 +235,18 @@ browser.runtime.onMessage.addListener((message: any) => {
             }).show();
           }
 
-          $('#tag').off('change keyup paste').on('change keyup paste', function (e) {
-            const code = e.charCode ? e.charCode : e.keyCode;
-            if (code && $.inArray(code, [
-              keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
-              keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
-            ]) === -1) {
-              $scope.pageInfo.tag = $('#tag').val() as string;
-              renderSuggest();
-              showAutoComplete();
-            }
-          }).off('keydown').on('keydown', function (e) {
+          $('#tag').off('change keyup paste')
+            .on('change keyup paste', function (e) {
+              const code = e.charCode ? e.charCode : e.keyCode;
+              if (code && $.inArray(code, [
+                keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
+                keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
+              ]) === -1) {
+                $scope.pageInfo.tag = $('#tag').val() as string;
+                renderSuggest();
+                showAutoComplete();
+              }
+            }).off('keydown').on('keydown', function (e) {
             chooseTag(e);
             renderSuggest();
           });
@@ -316,7 +332,8 @@ const renderBookmarkPage = () => {
   browser.tabs.query({active: true, currentWindow: true})
     .then((tabs) => {
       const tab = tabs[0];
-      if (tab.url!.indexOf('http://') !== 0 && tab.url!.indexOf('https://') !== 0 && tab.url!.indexOf('ftp://') !== 0) {
+      if (tab.url!.indexOf('http://') !== 0 && tab.url!.indexOf(
+        'https://') !== 0 && tab.url!.indexOf('ftp://') !== 0) {
         console.log('invalid tab');
         $scope.loadingText = 'Please select a valid tab';
         $scope.isLoading = true;
@@ -437,7 +454,8 @@ const renderAutoComplete = () => {
       if (item.isActive) {
         cls = 'active';
       }
-      $('#auto-complete ul').append('<li class="' + cls + '">' + escapeHTML(item.text) + '</li>');
+      $('#auto-complete ul')
+        .append('<li class="' + cls + '">' + escapeHTML(item.text) + '</li>');
     });
     $autocomplete.show();
   } else {
@@ -453,7 +471,8 @@ const renderSuggest = () => {
       if ($scope.pageInfo.tag!.split(' ').indexOf(suggest) != -1) {
         cls += ' selected';
       }
-      $('#suggest').append('<a href="#" class="' + cls + '">' + escapeHTML(suggest) + '</a>');
+      $('#suggest').append(
+        '<a href="#" class="' + cls + '">' + escapeHTML(suggest) + '</a>');
     });
     $('#suggest').append('<a href="#" class="add-all-tag">Add all</a>');
     $('.add-tag').off('click').on('click', function () {

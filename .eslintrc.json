@@ -18,6 +18,7 @@
   "rules":{
     "semi": 2,
     "quotes": ["warn", "single"],
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "max-len": ["error", 80]
   }
 }

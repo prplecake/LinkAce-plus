@@ -9,8 +9,7 @@ type SettingsValue = string | boolean | number;
 type SettingsMap = { [s: string]: SettingsValue };
 
 const defaultSettings: SettingsMap = {
-  'setPrivate': false,
-  'disableChecks': false,
+  'setPrivate': false, 'disableChecks': false,
 };
 
 class Settings {
@@ -58,7 +57,8 @@ class Settings {
     return defaultSettings[key] as SettingsTypeMap[T];
   }
 
-  public set<T extends keyof SettingsTypeMap>(key: T, value: SettingsTypeMap[T]) {
+  public set<T extends keyof SettingsTypeMap>(
+    key: T, value: SettingsTypeMap[T]) {
     this.map[key] = value;
   }
 
