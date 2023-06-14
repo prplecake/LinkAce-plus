@@ -1,4 +1,5 @@
 const StorageKeyPrefix = 'lauinfo_';
+
 export enum StorageKeys {
   Url = StorageKeyPrefix + 'url',
   ApiToken = StorageKeyPrefix + 'token',

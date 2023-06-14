@@ -1,4 +1,4 @@
-import browser, { Runtime, Tabs } from 'webextension-polyfill';
+import browser, {Runtime, Tabs} from 'webextension-polyfill';
 
 export type Callback = (params: any, sender?: Runtime.MessageSender) => any;
 
@@ -21,11 +21,10 @@ function init() {
 
 export function send(name: string, params?: any, callback?: (value: any) => any) {
   const data = {
-    action: name,
-    params,
+    action: name, params,
   };
   const promise = browser.runtime.sendMessage(data);
-  if (callback)  promise.then(callback);
+  if (callback) promise.then(callback);
 }
 
 export function sendSelf(name: string, params: any) {
@@ -40,12 +39,11 @@ export function sendSelf(name: string, params: any) {
 export function sendToAllTabs(name: string, params: any) {
   if (browser.tabs) {
     const data = {
-      action: name,
-      params,
+      action: name, params,
     };
     browser.tabs.query({}).then((tabs: Tabs.Tab[]) => {
       for (const tab of tabs) {
-        const { id } = tab;
+        const {id} = tab;
         if (id) browser.tabs.sendMessage(id, data);
       }
     });
@@ -54,8 +52,7 @@ export function sendToAllTabs(name: string, params: any) {
 
 export function sendToTab(tab: Tabs.Tab, name: string, params: any, callback?: (value: any) => any) {
   const data = {
-    action: name,
-    params,
+    action: name, params,
   };
   if (tab.id) {
     const promise = browser.tabs.sendMessage(tab.id, data);

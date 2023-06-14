@@ -2,8 +2,8 @@ import $ from 'jquery';
 import {PageInfo, Scope} from '../models/Scope';
 import {maxDescLen, StorageKeys} from '../common';
 import {Link} from '../models/LinkAce/Link';
-import KeyDownEvent = JQuery.KeyDownEvent;
 import './popup.scss';
+import KeyDownEvent = JQuery.KeyDownEvent;
 
 const bg: any = browser.extension.getBackgroundPage(),
   keyCode = {enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32},
@@ -222,8 +222,10 @@ browser.runtime.onMessage.addListener((message: any) => {
 
           $('#tag').off('change keyup paste').on('change keyup paste', function (e) {
             const code = e.charCode ? e.charCode : e.keyCode;
-            if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
-              keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) === -1) {
+            if (code && $.inArray(code, [
+              keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
+              keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
+            ]) === -1) {
               $scope.pageInfo.tag = $('#tag').val() as string;
               renderSuggest();
               showAutoComplete();
@@ -334,8 +336,10 @@ const chooseTag = (e: KeyDownEvent) => {
   let newItems;
   let idx;
   const code = e.charCode ? e.charCode : e.keyCode;
-  if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
-    keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) !== -1) {
+  if (code && $.inArray(code, [
+    keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
+    keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
+  ]) !== -1) {
     if (code == keyCode.enter || code == keyCode.tab) {
       if ($scope.isShowAutoComplete) {
         e.preventDefault();

@@ -1,9 +1,9 @@
 // {url: {title, desc, tag, time, isSaved, isSaving}}
 import {mainPath, StorageKeys} from './common';
-import Tab = browser.tabs.Tab;
 import {PageInfo, UserInfo} from './models/Scope';
 import {Link} from './models/LinkAce/Link';
 import {validProto} from './lib/utils';
+import Tab = browser.tabs.Tab;
 
 declare let window: any;
 
