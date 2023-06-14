@@ -1,9 +1,8 @@
-import $ from 'jquery';
 import {PageInfo, Scope} from '../models/Scope';
 import {maxDescLen, StorageKeys} from '../common';
 import {Link} from '../models/LinkAce/Link';
-import KeyDownEvent = JQuery.KeyDownEvent;
 import './popup.scss';
+import {byId, hide, show} from "../lib/htmlUtils";
 
 const bg: any = browser.extension.getBackgroundPage(),
   keyCode = {enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32},
@@ -73,39 +72,50 @@ const $scope: Scope = {
   pageInfo: {}
 };
 
-const $loading = $('#state-mask').hide();
-const $login = $('#login-window').hide();
-const $bookmark = $('#bookmark-window').hide();
-const $postform = $('#add-post-form').hide();
-const $autocomplete = $('#auto-complete').hide();
+const $loading = byId('state-mask');
+const $login = byId('login-window');
+const $bookmark = byId('bookmark-window');
+const $postform = byId('add-post-form');
+const $autocomplete = byId('auto-complete');
+
+[
+  $loading,
+  $login,
+  $bookmark,
+  $postform,
+  $autocomplete
+].forEach(elem => {
+  if (elem) elem.style.display = 'none';
+});
 
 (() => {
-  $('#logo-link').attr('href', localStorage.getItem('linkace_url'));
+  (byId('logo-link') as HTMLAnchorElement).href = localStorage[StorageKeys.Url];
 })();
 
 const renderLoading = function (loadingText?: string) {
   $scope.loadingText = loadingText || $scope.loadingText;
-  if ($scope.isLoading === true) {
-    $loading.text($scope.loadingText);
-    $loading.show();
+  if ($loading && $scope.isLoading === true) {
+    $loading.textContent = $scope.loadingText;
+    show($loading);
   } else {
-    $loading.hide();
+    hide($loading);
   }
 };
 renderLoading();
 
 const renderLoginPage = function () {
   console.log('rendering login page');
-  $login.show();
+  show($login);
 
-  const $loginerr = $('#login-error');
+  const $loginerr = byId('login-error');
   if ($scope.isLoginError === true) {
-    $loginerr.show();
+    show($loginerr);
   } else {
-    $loginerr.hide();
+    hide($loginerr);
   }
 
-  $('#login-btn').off('click').on('click', loginSubmit);
+  const $loginBtn = byId('login-btn');
+  if ($loginBtn) $loginBtn.addEventListener('click', loginSubmit);
 };
 
 browser.runtime.onMessage.addListener((message: any) => {
@@ -115,21 +125,21 @@ browser.runtime.onMessage.addListener((message: any) => {
     $scope.isLoginError = false;
 
     renderUserInfo();
-    $loading.hide();
+    hide($loading);
     renderBookmarkPage();
   } else if (message.type === 'login-failed') {
     $scope.isLoading = false;
     $scope.isLoginError = true;
 
-    $loading.hide();
+    hide($loading);
     renderLoginPage();
   } else if (message.type === 'logged-out') {
     $scope.isAnony = true;
     $scope.isLoading = false;
     $scope.isLoginError = false;
 
-    $bookmark.hide();
-    $loading.hide();
+    hide($bookmark);
+    hide($loading);
     renderLoginPage();
   } else if (message.type === 'render-suggests') {
     $scope.suggests = message.data;
@@ -154,11 +164,11 @@ browser.runtime.onMessage.addListener((message: any) => {
             pageInfo.tag = pageInfo.tag.concat(' ');
           }
           pageInfo.isPrivate = !pageInfo.shared;
-          $scope.pageInfo = $.extend({}, pageInfo);
+          $scope.pageInfo = Object.assign({}, pageInfo);
 
-          $('#url').val(pageInfo.url as string);
-          $('#title').val(pageInfo.title as string);
-          $('#tag').val(pageInfo.tag as string);
+          (byId('url') as HTMLInputElement)!.value = (pageInfo.url as string);
+          (byId('title') as HTMLInputElement)!.value = (pageInfo.title as string);
+          (byId('tag') as HTMLInputElement)!.value = (pageInfo.tag as string);
           console.log('desc: ', pageInfo.desc);
           if (!pageInfo.desc) {
             // TODO: resolve dependency on chrome
@@ -176,74 +186,88 @@ browser.runtime.onMessage.addListener((message: any) => {
                     desc = desc.slice(0, maxDescLen) + '...';
                   }
                   pageInfo.desc = desc;
-                  $('#desc').val(pageInfo.desc as string);
+                  (byId('desc') as HTMLInputElement).value = pageInfo.desc as string;
                 }
               }
             );
           } else {
-            $('#desc').val(pageInfo.desc);
+            (byId('desc') as HTMLInputElement).value = pageInfo.desc;
           }
 
           if (pageInfo.isPrivate) {
-            $('#private').prop('checked', true);
+            (byId('private') as HTMLInputElement).checked = true;
           }
           if (pageInfo.toread === true) {
-            $('#toread').prop('checked', true);
+            (byId('toread') as HTMLInputElement).checked = true;
           }
 
           renderError();
 
-          const $savetime = $('.alert-savetime').hide();
-          if (pageInfo.time) {
-            $savetime.text(renderSavedTime(pageInfo.time));
-            $savetime.show();
-          } else {
-            $savetime.hide();
+          const $savetime = byId('alert-savetime');
+          if ($savetime) hide($savetime);
+          if ($savetime && pageInfo.time) {
+            $savetime.textContent = renderSavedTime(pageInfo.time);
+            show($savetime);
           }
 
           if (pageInfo.isSaved === true) {
-            $('#opt-delete').off('click').on('click', function () {
-              $('#opt-cancel-delete').off('click').on('click', function () {
-                $('#opt-confirm').hide();
-                $('#opt-delete').show();
+            const $optDelete = byId('opt-delete');
+            if ($optDelete) {
+              $optDelete.addEventListener('click', function () {
+                const $optCancelDelete = byId('opt-cancel-delete');
+                const $optConfirm = byId('opt-confirm');
+                if ($optCancelDelete) {
+                  $optCancelDelete.addEventListener('click', function () {
+                    if ($optConfirm) hide($optConfirm);
+                    show($optDelete);
+                    return false;
+                  });
+                }
+
+                const $optDestroy = byId('opt-destroy');
+                if ($optDestroy) {
+                  $optDestroy.addEventListener('click', function () {
+                    postDelete();
+                    return false;
+                  });
+                }
+
+                hide($optDelete);
+                show($optConfirm);
                 return false;
               });
-
-              $('#opt-destroy').off('click').on('click', function () {
-                postDelete();
-                return false;
-              });
-
-              $('#opt-delete').hide();
-              $('#opt-confirm').show();
-              return false;
-            }).show();
+              show($optDelete);
+            }
           }
 
-          $('#tag').off('change keyup paste').on('change keyup paste', function (e) {
-            const code = e.charCode ? e.charCode : e.keyCode;
-            if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
-              keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) === -1) {
-              $scope.pageInfo.tag = $('#tag').val() as string;
+          const $tag = byId('tag');
+          if ($tag) {
+            $tag.addEventListener('change keyup paste', function (e) {
+              const code = e.charCode ? e.charCode : e.keyCode;
+              if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
+                keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) === -1) {
+                $scope.pageInfo.tag = $('#tag').val() as string;
+                renderSuggest();
+                showAutoComplete();
+              }
+            });
+            $tag.addEventListener('keydown', function (e) {
+              chooseTag(e);
               renderSuggest();
-              showAutoComplete();
-            }
-          }).off('keydown').on('keydown', function (e) {
-            chooseTag(e);
-            renderSuggest();
-          });
+            });
 
-          $postform.off('submit').on('submit', function () {
-            postSubmit();
-            return false;
-          });
+            if ($postform) $postform.addEventListener('submit', function () {
+              postSubmit();
+              return false;
+            });
 
-          $scope.isLoading = false;
-          renderLoading();
+            $scope.isLoading = false;
+            renderLoading();
 
-          $postform.show();
+            if ($postform) show($postform);
 
-          $('#tag').focus();
+            $tag.focus();
+          }
         });
     } else {
       console.log('query bookmark info error');
@@ -273,13 +297,13 @@ browser.runtime.onMessage.addListener((message: any) => {
 });
 
 const loginSubmit = () => {
-  const linkAceUrl = $('#linkAceUrl').val() as string,
-    authToken = $('#token').val() as string;
+  const linkAceUrl = (byId('linkAceUrl') as HTMLInputElement).value,
+    authToken = (byId('token') as HTMLInputElement).value;
   requestPermissions(linkAceUrl);
   if (linkAceUrl && authToken) {
     $scope.loadingText = 'log in...';
     $scope.isLoading = true;
-    $login.hide();
+    hide($login);
     renderLoading();
     bg.login({url: linkAceUrl, token: authToken});
     return false;
@@ -287,7 +311,8 @@ const loginSubmit = () => {
 };
 
 const renderPageHeader = () => {
-  $('.logout a').on('click', function () {
+  const $logoutLink = byId('logout-link');
+  if ($logoutLink) $logoutLink.addEventListener('click', function () {
     console.log('log out...');
     $scope.isLoading = true;
     $scope.loadingText = 'Log out...';
@@ -297,19 +322,20 @@ const renderPageHeader = () => {
 };
 
 const renderError = () => {
-  const $posterr = $('.alert-error').hide();
-  if ($scope.isPostError === true) {
-    $posterr.text($scope.postErrorText as string);
-    $posterr.show();
-    $postform.show();
+  const $posterr = byId('alert-error-div');
+  if ($posterr) hide($posterr);
+  if ($posterr && $scope.isPostError === true) {
+    $posterr.textContent = $scope.postErrorText as string;
+    show($posterr);
+    show($postform);
   } else {
-    $posterr.hide();
+    if ($posterr) hide($posterr);
   }
 };
 
 const renderBookmarkPage = () => {
   console.log('rendering bookmark page');
-  $bookmark.show();
+  if ($bookmark) show($bookmark);
   renderPageHeader();
   browser.tabs.query({active: true, currentWindow: true})
     .then((tabs) => {
