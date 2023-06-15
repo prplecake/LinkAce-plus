@@ -139,7 +139,6 @@ browser.runtime.onMessage.addListener((message: any) => {
     renderLoginPage();
   } else if (message.type === 'render-suggests') {
     $scope.suggests = message.data;
-    renderSuggest();
   } else if (message.type === 'render-page-info') {
     if (message.data) {
       browser.tabs.query({active: true, currentWindow: true})
@@ -230,39 +229,6 @@ browser.runtime.onMessage.addListener((message: any) => {
               show($optDelete);
             }
           }
-
-          const $tag = byId('tag');
-          if ($tag) {
-            $tag.addEventListener('change keyup paste', function (e) {
-              const code = e.charCode ? e.charCode : e.keyCode;
-              if (code && $.inArray(code, [
-                keyCode.enter, keyCode.tab, keyCode.up, keyCode.down, keyCode.n,
-                keyCode.p, keyCode.ctrl, keyCode.space
-              ]) === -1) {
-                $scope.pageInfo.tag = $('#tag').val() as string;
-                renderSuggest();
-                showAutoComplete();
-              }
-            });
-            $tag.addEventListener('keydown', function (e) {
-              chooseTag(e);
-              renderSuggest();
-            });
-
-            if ($postform) {
-              $postform.addEventListener('submit', function () {
-                postSubmit();
-                return false;
-              });
-            }
-
-            $scope.isLoading = false;
-            renderLoading();
-
-            if ($postform) show($postform);
-
-            $tag.focus();
-          }
         });
     } else {
       console.log('query bookmark info error');
@@ -352,158 +318,6 @@ const renderBookmarkPage = () => {
 
       bg.getPageInfo(tab.url);
     });
-};
-
-const chooseTag = (e: KeyDownEvent) => {
-  let newItems;
-  let idx;
-  const code = e.charCode ? e.charCode : e.keyCode;
-  if (code && $.inArray(code, [
-    keyCode.enter, keyCode.tab, keyCode.up, keyCode.down, keyCode.n, keyCode.p,
-    keyCode.ctrl, keyCode.space
-  ]) !== -1) {
-    if (code == keyCode.enter || code == keyCode.tab) {
-      if ($scope.isShowAutoComplete) {
-        e.preventDefault();
-        // submit tag
-        const items = $scope.pageInfo.tag.split(' '),
-          tag = $scope.autoCompleteItems[$scope.activeItemIndex];
-        items.splice(items.length - 1, 1, tag.text);
-        $scope.pageInfo.tag = items.join(' ') + ' ';
-        $('#tag').val($scope.pageInfo.tag);
-        $scope.isShowAutoComplete = false;
-        renderAutoComplete();
-      } else if (code == keyCode.enter) {
-        postSubmit();
-        return false;
-      }
-    } else if (code == keyCode.down || (code == keyCode.n && e.ctrlKey)) {
-      // move up one item
-      e.preventDefault();
-      idx = $scope.activeItemIndex + 1;
-      if (idx >= $scope.autoCompleteItems.length) {
-        idx = 0;
-      }
-      newItems = $scope.autoCompleteItems.map(function (item) {
-        return {text: item.text, isActive: false};
-      });
-      $scope.autoCompleteItems = newItems;
-      $scope.activeItemIndex = idx;
-      $scope.autoCompleteItems[idx].isActive = true;
-      renderAutoComplete();
-    } else if (code == keyCode.up || (code == keyCode.p && e.ctrlKey)) {
-      // move down one item
-      e.preventDefault();
-      idx = $scope.activeItemIndex - 1;
-      if (idx < 0) {
-        idx = $scope.autoCompleteItems.length - 1;
-      }
-      newItems = $scope.autoCompleteItems.map(function (item) {
-        return {text: item.text, isActive: false};
-      });
-      $scope.autoCompleteItems = newItems;
-      $scope.activeItemIndex = idx;
-      $scope.autoCompleteItems[idx].isActive = true;
-      renderAutoComplete();
-    } else if (code == keyCode.space) {
-      $scope.isShowAutoComplete = false;
-      renderAutoComplete();
-    }
-  }
-};
-
-const showAutoComplete = () => {
-  const items = $scope.pageInfo.tag.split(' ');
-  let word = items[items.length - 1];
-  const MAX_SHOWN_ITEMS = 5;
-  if (word) {
-    word = word.toLowerCase();
-    const allTags: string[] = $scope.allTags;
-    let shownCount = 0;
-    const autoCompleteItems = [];
-    let i = 0;
-    const len = allTags.length;
-    for (; i < len && shownCount < MAX_SHOWN_ITEMS; i++) {
-      const tag = allTags[i].toLowerCase();
-      if (tag.indexOf(word) == 0 && $.inArray(tag, items) === -1) {
-        const item = {text: tag, isActive: false};
-        autoCompleteItems.push(item);
-        shownCount += 1;
-      }
-    }
-    if (shownCount) {
-      $scope.autoCompleteItems = autoCompleteItems.reverse();
-      $scope.autoCompleteItems[0].isActive = true;
-      $scope.activeItemIndex = 0;
-      $scope.isShowAutoComplete = true;
-      const tagEl = $('#tag'), pos = $('#tag').offset();
-      pos.top = pos.top + tagEl.outerHeight();
-      $autocomplete.css({'left': pos.left, 'top': pos.top});
-    } else {
-      $scope.isShowAutoComplete = false;
-    }
-  } else {
-    $scope.isShowAutoComplete = false;
-  }
-  renderAutoComplete();
-};
-
-const renderAutoComplete = () => {
-  if ($scope.isShowAutoComplete === true) {
-    $('#auto-complete ul').html('');
-    $.each($scope.autoCompleteItems, function (index, item) {
-      let cls = '';
-      if (item.isActive) {
-        cls = 'active';
-      }
-      $('#auto-complete ul')
-        .append('<li class="' + cls + '">' + escapeHTML(item.text) + '</li>');
-    });
-    $autocomplete.show();
-  } else {
-    $autocomplete.hide();
-  }
-};
-
-const renderSuggest = () => {
-  if ($scope.suggests && $scope.suggests.length > 0) {
-    $('#suggest').html('');
-    $.each($scope.suggests, function (index, suggest) {
-      let cls = 'add-tag';
-      if ($scope.pageInfo.tag.split(' ').indexOf(suggest) != -1) {
-        cls += ' selected';
-      }
-      $('#suggest').append(
-        '<a href="#" class="' + cls + '">' + escapeHTML(suggest) + '</a>');
-    });
-    $('#suggest').append('<a href="#" class="add-all-tag">Add all</a>');
-    $('.add-tag').off('click').on('click', function () {
-      const tag = $(this).text();
-      addTags([tag]);
-      $(this).addClass('selected');
-    });
-    $('.add-all-tag').off('click').on('click', function () {
-      addTags([$scope.suggests as string]); // TODO?
-    });
-    $('#suggest-list').show();
-  } else {
-    $('#suggest-list').hide();
-  }
-};
-
-const addTag = (s: string) => {
-  const t = $scope.pageInfo.tag.trim();
-  // skip if tag already added
-  if ($.inArray(s, t.split(' ')) === -1) {
-    $scope.pageInfo.tag = t + ' ' + s + ' ';
-  }
-  $('#tag').val($scope.pageInfo.tag);
-};
-
-const addTags = (tags: string[]) => {
-  $.each(tags, function (index, tag) {
-    addTag(tag);
-  });
 };
 
 const postSubmit = () => {
