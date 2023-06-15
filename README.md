@@ -2,7 +2,7 @@
 
 A better firefox add-on for [LinkAce](https://linkace.org).
 
-Current version: 0.0.1
+Current version: 0.0.2
 
 ## Usage
 
@@ -26,6 +26,8 @@ Install From [Firefox Add-ons site][amo]
 yarn install
 # build extension
 yarn run build
+# package extension
+pushd dist; zip -r ../LinkAce+-build.zip ./*; popd
 ```
 
 The built extension will be in `dist/`.

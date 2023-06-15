@@ -1,6 +1,6 @@
 // {url: {title, desc, tag, time, isSaved, isSaving}}
 import {mainPath, StorageKeys} from './common';
-import {PageInfo, UserInfo} from './models/Scope';
+import {UserInfo} from './models/Scope';
 import {Link} from './models/LinkAce/Link';
 import {validProto} from './lib/utils';
 import Tab = browser.tabs.Tab;
@@ -103,11 +103,12 @@ window.getPageInfo = getPageInfo;
 
 const setPageInfo = (tab: Tab) => {
   // console.log('tab: ', tab);
-  const pageInfo: PageInfo = {
-    url: tab.url,
-    title: tab.title,
-  };
-  pages[tab.url!] = pageInfo;
+  if (tab.url) {
+    pages[tab.url] = {
+      url: tab.url,
+      title: tab.title,
+    };
+  }
 };
 
 const addPost = (info: any) => {
@@ -207,9 +208,9 @@ Attempt to create a page action on this tab.
 Do not show if options checkbox is checked or this is an invalid tab.
 */
 const attemptPageAction = (tab: Tab) => {
-  browser.pageAction.hide(tab.id!);
+  if (tab.id) browser.pageAction.hide(tab.id);
   if (localStorage[StorageKeys.NoPageAction] !== 'true' && validProto(
-    tab.url)) {
-    browser.pageAction.show(tab.id!);
+    tab.url) && tab.id) {
+    browser.pageAction.show(tab.id);
   }
 };
