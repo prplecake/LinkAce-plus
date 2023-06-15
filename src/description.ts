@@ -1,7 +1,11 @@
-console.log('description page');
+import {Logger} from './lib/logger';
+
+const logger = new Logger('description');
+
+logger.log('description page');
 
 browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  console.log('receive message: ' + JSON.stringify(message));
+  logger.log('receive message: ' + JSON.stringify(message));
   if (message.method == 'getDescription') {
     let description = (window.getSelection() || '').toString();
     if (!description || description == '') {
