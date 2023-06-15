@@ -2,7 +2,7 @@
 
 A better firefox add-on for [LinkAce](https://linkace.org).
 
-Current version: 0.0.1
+Current version: 0.0.2
 
 ## Usage
 
