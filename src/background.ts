@@ -3,15 +3,18 @@ import {mainPath, StorageKeys} from './common';
 import {PageInfo, UserInfo} from './models/Scope';
 import {Link} from './models/LinkAce/Link';
 import {validProto} from './lib/utils';
+import {Logger} from './lib/logger';
 import Tab = browser.tabs.Tab;
 
 declare let window: any;
+
+const logger = new Logger('background');
 
 const pages: { [id: string]: any } = {};
 let _userInfo: UserInfo;
 
 const login = async (obj: { url: string, token: string }) => {
-  console.log(obj);
+  logger.log(obj);
   // test auth
   const path = obj.url + '/links';
   const options = {
@@ -23,7 +26,7 @@ const login = async (obj: { url: string, token: string }) => {
   fetch(path, options)
     .then(response => {
       if (response.ok) {
-        console.log(response);
+        logger.log(response);
         _userInfo.isChecked = true;
         localStorage[StorageKeys.Url] = obj.url;
         localStorage[StorageKeys.ApiToken] = obj.token;
@@ -40,7 +43,7 @@ const login = async (obj: { url: string, token: string }) => {
       }
     })
     .catch(error => {
-      console.error(error);
+      logger.error(error);
       browser.runtime.sendMessage({
         type: 'login-failed'
       });
@@ -82,15 +85,15 @@ window.getUserInfo = getUserInfo;
 // for popup.html to acquire page info
 // if there is no page info at local then get it from server
 const getPageInfo = (url: string) => {
-  // console.log('getPageInfo');
+  // logger.log('getPageInfo');
   if (!url || (url.indexOf('https://') !== 0 && url.indexOf('http://') !== 0)) {
     return {url: url, isSaved: false};
   }
-  console.log('url: ', url);
-  console.log('pages: ', pages);
+  logger.log('url: ', url);
+  logger.log('pages: ', pages);
 
   const pageInfo = pages[url];
-  console.log('pageInfo: ', pageInfo);
+  logger.log('pageInfo: ', pageInfo);
   if (pageInfo) {
     browser.runtime.sendMessage({
       type: 'render-page-info',
@@ -102,7 +105,7 @@ const getPageInfo = (url: string) => {
 window.getPageInfo = getPageInfo;
 
 const setPageInfo = (tab: Tab) => {
-  // console.log('tab: ', tab);
+  // logger.log('tab: ', tab);
   const pageInfo: PageInfo = {
     url: tab.url,
     title: tab.title,
@@ -111,7 +114,7 @@ const setPageInfo = (tab: Tab) => {
 };
 
 const addPost = (info: any) => {
-  console.log('info before post: ', info);
+  logger.log('info before post: ', info);
   const userInfo = getUserInfo();
   if (userInfo && userInfo.isChecked && info.url && info.title) {
     const path = mainPath + 'links',
@@ -122,9 +125,9 @@ const addPost = (info: any) => {
         tags: info.tags,
         lists: info.lists,
       };
-    console.log('path: ', path);
+    logger.log('path: ', path);
     info.shared && (data.is_private !== info.shared);
-    console.log('link data before post: ', data);
+    logger.log('link data before post: ', data);
     const options = {
       method: 'POST',
       headers: new Headers({
@@ -135,11 +138,11 @@ const addPost = (info: any) => {
     };
     fetch(path, options)
       .then(response => {
-        console.log(response);
+        logger.log(response);
         if (response.ok) {
           pages[info.url].isSaved = true;
           pages[info.url].isSaving = false;
-          console.log('pages info after saving: ', pages[info.url]);
+          logger.log('pages info after saving: ', pages[info.url]);
           browser.runtime.sendMessage({
             type: 'addpost-succeed'
           });
@@ -171,7 +174,7 @@ window.addPost = addPost;
 browser.tabs.query({active: true, currentWindow: true})
   .then((tabs) => {
     const tab = tabs[0];
-    console.log('query tab pin state on loaded');
+    logger.log('query tab pin state on loaded');
     attemptPageAction(tab);
     setPageInfo(tab);
   });
@@ -180,12 +183,12 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
   if (changeInfo.url) {
     const url = changeInfo.url;
     if (!pages.hasOwn(url)) {
-      console.log('query tab pin state on updated');
+      logger.log('query tab pin state on updated');
       attemptPageAction(tab);
       setPageInfo(tab);
     }
   }
-  console.log('set tab pin state on opening');
+  logger.log('set tab pin state on opening');
   attemptPageAction(tab);
 });
 
@@ -195,7 +198,7 @@ browser.tabs.onActivated.addListener((activeInfo) => {
       const tab = tabs[0];
       const url = tab.url as string;
       if (!pages.hasOwn(url)) {
-        console.log('query tab pin state on activated');
+        logger.log('query tab pin state on activated');
         attemptPageAction(tab);
         setPageInfo(tab);
       }
