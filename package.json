@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "build": "webpack --config webpack/webpack.config.js --env production",
-    "dev": "webpack --config webpack/webpack.config.js --watch --progress",
+    "build": "webpack --config webpack/webpack.config.ts --env production",
+    "dev": "webpack --config webpack/webpack.config.ts --watch --progress",
     "lint:js": "eslint src/**/*.{ts,tsx}",
     "test": "jest",
     "coverage": "jest --coverage"
