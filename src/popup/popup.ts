@@ -164,7 +164,7 @@ browser.runtime.onMessage.addListener((message: any) => {
           (byId('url') as HTMLInputElement).value = (pageInfo.url as string);
           (byId(
             'title') as HTMLInputElement).value = (pageInfo.title as string);
-          (byId('tag') as HTMLInputElement).value = (pageInfo.tag as string);
+          (byId('tag') as HTMLInputElement).value = pageInfo.tag ?? '';
           logger.log('desc: ', pageInfo.desc);
           if (!pageInfo.desc) {
             // TODO: resolve dependency on chrome
@@ -232,6 +232,15 @@ browser.runtime.onMessage.addListener((message: any) => {
               show($optDelete);
             }
           }
+          if ($postform) {
+            $postform.addEventListener('submit', () => {
+              postSubmit();
+              return false;
+            });
+          }
+          $scope.isLoading = false;
+          renderLoading();
+          if ($postform) show($postform);
         });
     } else {
       logger.log('query bookmark info error');
