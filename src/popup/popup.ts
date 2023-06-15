@@ -318,21 +318,21 @@ const postSubmit = () => {
   logger.log('post new bookmark');
   $scope.isLoading = true;
   $scope.loadingText = 'Saving...';
-  $postform.hide();
+  hide($postform);
   $scope.isPostError = false;
   renderError();
   renderLoading();
 
   const info: Link = {
-    url: $('#url').val() as string,
-    title: $('#title').val() as string,
-    description: $('#desc').val() as string,
-    lists: $('#list').val() as string,
-    tags: $('#tag').val() as string,
+    url: (byId('url') as HTMLInputElement).value,
+    title: (byId('title') as HTMLInputElement).value,
+    description: (byId('desc') as HTMLInputElement).value,
+    lists: (byId('list') as HTMLInputElement).value,
+    tags: (byId('tag') as HTMLInputElement).value,
   };
   logger.log('link info: ', info);
 
-  info.is_private = !!$('#private').prop('checked');
+  info.is_private = (byId('private') as HTMLInputElement).checked;
   bg.addPost(info);
 };
 
@@ -340,7 +340,7 @@ const postDelete = () => {
   logger.log('delete bookmark');
   $scope.isLoading = true;
   $scope.loadingText = 'Deleting...';
-  $postform.hide();
+  hide($postform);
   $scope.isPostError = false;
   renderError();
   renderLoading();
@@ -351,26 +351,24 @@ const postDelete = () => {
     });
 };
 
-$('#linkAceUrl').on('input', () => {
-  const val = $('#linkAceUrl').val();
-  logger.log(val);
-  $('#linkAceSettingsUrl').attr('href', `${val}/settings`);
-});
+const $linkAceUrl = byId('linkAceUrl');
+if ($linkAceUrl) {
+  $linkAceUrl.addEventListener('input', () => {
+    const val = ($linkAceUrl as HTMLInputElement).value;
+    console.log(val);
+    const $linkAceSettingsUrl = byId('linkAceSettingsUrl');
+    if ($linkAceSettingsUrl) {
+      ($linkAceSettingsUrl as HTMLAnchorElement).href = `${val}/settings`;
+    }
+  });
+}
 
-$('.link').on('click', function () {
-  const url = $(this).attr('href');
-  browser.tabs.query({})
-    .then((tabs) => {
-      const index = tabs.length;
-      browser.tabs.create({url: url, index: index});
-      window.close();
-    });
-  return false;
-});
-
-$('#option-link').off('click').on('click', function () {
-  browser.runtime.openOptionsPage();
-});
+const $optionLink = byId('option-link');
+if ($optionLink) {
+  $optionLink.addEventListener('click', function () {
+    browser.runtime.openOptionsPage();
+  });
+}
 
 const renderUserInfo = () => {
   const userInfo = bg.getUserInfo();
