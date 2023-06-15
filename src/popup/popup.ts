@@ -245,15 +245,6 @@ browser.runtime.onMessage.addListener((message: any) => {
     $scope.postErrorText = message.error;
     renderError();
     renderLoading();
-  } else if (message.type === 'deletepost-succeed') {
-    $scope.isPostError = false;
-    window.close();
-  } else if (message.type === 'deletepost-failed') {
-    $scope.isLoading = false;
-    $scope.isPostError = true;
-    $scope.postErrorText = message.error;
-    renderError();
-    renderLoading();
   }
 });
 
