@@ -2,6 +2,9 @@ import $ from 'jquery';
 import {byId} from '../lib/htmlUtils';
 import './options.scss';
 import {StorageKeys} from '../common';
+import {Logger} from '../lib/logger';
+
+const logger = new Logger('options');
 
 const input: {
   [s: string]: { storageKey: string, element: HTMLInputElement }
@@ -23,8 +26,8 @@ const input: {
 
 for (const [key, value] of Object.entries(input)) {
   value.element.addEventListener('change', (e) => {
-    console.log(e);
-    console.log(key, value);
+    logger.log(e);
+    logger.log(key, value);
     if (value.element.type === 'checkbox') {
       localStorage[value.storageKey] = $(value.element).prop('checked');
     } else {
@@ -34,7 +37,7 @@ for (const [key, value] of Object.entries(input)) {
 }
 
 window.addEventListener('load', (e) => {
-  console.log(e);
+  logger.log(e);
   for (const [key, value] of Object.entries(input)) {
     if (value.element.type === 'checkbox') {
       $(value.element)
