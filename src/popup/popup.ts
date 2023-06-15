@@ -3,6 +3,9 @@ import {maxDescLen, StorageKeys} from '../common';
 import {Link} from '../models/LinkAce/Link';
 import './popup.scss';
 import {byId, hide, show} from "../lib/htmlUtils";
+import {Logger} from '../lib/logger';
+
+const logger = new Logger('popup');
 
 const bg: any = browser.extension.getBackgroundPage(), keyCode = {
   enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32
@@ -15,16 +18,16 @@ const requestPermissions = async (url: string) => {
   };
   const onResponse = (response: boolean) => {
     if (response) {
-      console.log('permission was granted');
+      logger.log('permission was granted');
     } else {
-      console.log('permission was refused');
+      logger.log('permission was refused');
     }
     return browser.permissions.getAll();
   };
 
   const response = await browser.permissions.request(permissionsToRequest);
   const currentPermissions = await onResponse(response);
-  console.log('Current permissions: ', currentPermissions);
+  logger.log('Current permissions: ', currentPermissions);
 };
 
 const escapeHTML = function (str: string) {
@@ -100,7 +103,7 @@ const renderLoading = function (loadingText?: string) {
 renderLoading();
 
 const renderLoginPage = function () {
-  console.log('rendering login page');
+  logger.log('rendering login page');
   show($login);
 
   const $loginerr = byId('login-error');
@@ -115,7 +118,7 @@ const renderLoginPage = function () {
 };
 
 browser.runtime.onMessage.addListener((message: any) => {
-  console.log('receive message: ' + JSON.stringify(message));
+  logger.log('receive message: ' + JSON.stringify(message));
   if (message.type === 'login-succeed') {
     $scope.isLoading = false;
     $scope.isLoginError = false;
@@ -163,16 +166,16 @@ browser.runtime.onMessage.addListener((message: any) => {
           (byId(
             'title') as HTMLInputElement).value = (pageInfo.title as string);
           (byId('tag') as HTMLInputElement).value = (pageInfo.tag as string);
-          console.log('desc: ', pageInfo.desc);
+          logger.log('desc: ', pageInfo.desc);
           if (!pageInfo.desc) {
             // TODO: resolve dependency on chrome
             chrome.tabs.sendMessage(tab.id as number, {
               method: 'getDescription'
             }, function (response) {
-              console.log(response);
+              logger.log(response);
               if (response && response.data.length !== 0) {
                 let desc = response.data;
-                console.log('desc: ', desc);
+                logger.log('desc: ', desc);
                 if (desc.length > maxDescLen) {
                   desc = desc.slice(0, maxDescLen) + '...';
                 }
@@ -265,7 +268,7 @@ browser.runtime.onMessage.addListener((message: any) => {
           }
         });
     } else {
-      console.log('query bookmark info error');
+      logger.log('query bookmark info error');
       $scope.loadingText = 'Query bookmark info error';
       $scope.isLoading = true;
       renderLoading();
@@ -309,7 +312,7 @@ const renderPageHeader = () => {
   const $logoutLink = byId('logout-link');
   if ($logoutLink) {
     $logoutLink.addEventListener('click', function () {
-      console.log('log out...');
+      logger.log('log out...');
       $scope.isLoading = true;
       $scope.loadingText = 'Log out...';
       renderLoading();
@@ -331,7 +334,7 @@ const renderError = () => {
 };
 
 const renderBookmarkPage = () => {
-  console.log('rendering bookmark page');
+  logger.log('rendering bookmark page');
   if ($bookmark) show($bookmark);
   renderPageHeader();
   browser.tabs.query({active: true, currentWindow: true})
@@ -339,7 +342,7 @@ const renderBookmarkPage = () => {
       const tab = tabs[0];
       if (tab.url && tab.url.indexOf('http://') !== 0 && tab.url.indexOf(
         'https://') !== 0 && tab.url.indexOf('ftp://') !== 0) {
-        console.log('invalid tab');
+        logger.log('invalid tab');
         $scope.loadingText = 'Please select a valid tab';
         $scope.isLoading = true;
         renderLoading();
@@ -507,7 +510,7 @@ const addTags = (tags: string[]) => {
 };
 
 const postSubmit = () => {
-  console.log('post new bookmark');
+  logger.log('post new bookmark');
   $scope.isLoading = true;
   $scope.loadingText = 'Saving...';
   $postform.hide();
@@ -522,14 +525,14 @@ const postSubmit = () => {
     lists: $('#list').val() as string,
     tags: $('#tag').val() as string,
   };
-  console.log('link info: ', info);
+  logger.log('link info: ', info);
 
   info.is_private = !!$('#private').prop('checked');
   bg.addPost(info);
 };
 
 const postDelete = () => {
-  console.log('delete bookmark');
+  logger.log('delete bookmark');
   $scope.isLoading = true;
   $scope.loadingText = 'Deleting...';
   $postform.hide();
@@ -545,7 +548,7 @@ const postDelete = () => {
 
 $('#linkAceUrl').on('input', () => {
   const val = $('#linkAceUrl').val();
-  console.log(val);
+  logger.log(val);
   $('#linkAceSettingsUrl').attr('href', `${val}/settings`);
 });
 
@@ -579,4 +582,4 @@ if ($scope.isAnony) {
   renderBookmarkPage();
 }
 
-console.log($scope);
+logger.log($scope);
