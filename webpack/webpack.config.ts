@@ -6,7 +6,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-const config: webpack.Configuration = {
+let config: webpack.Configuration = {
   // Mode is forced to production because chrome does not allow unsafe-eval in
   // extensions.
   mode: 'production',
@@ -87,5 +87,15 @@ const config: webpack.Configuration = {
     }),
   ],
 };
+
+if (!isProduction) {
+  config = {
+    ...config, ...{
+      optimization: {
+        minimize: false
+      }
+    }
+  };
+}
 
 export default config;
