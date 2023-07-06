@@ -6,7 +6,7 @@ logger.log('description page');
 
 browser.runtime.onMessage.addListener(
   function (message, sender, sendResponse) {
-    logger.log("receive message: " + JSON.stringify(message))
+    logger.log('receive message: ' + JSON.stringify(message));
     if (message.method == 'getDescription') {
       let description = (window.getSelection() || '').toString();
       if (!description || description == '') {

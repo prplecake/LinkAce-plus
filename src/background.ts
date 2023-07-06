@@ -490,7 +490,7 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
   }
   if (changeInfo.url) {
     const url = changeInfo.url;
-    if (!pages.hasOwnProperty(url)) {
+    if (!Object.hasOwn(pages, url)) {
       logger.log('query tab pin state on updated');
       attemptPageAction(tab);
       setPageInfo(tab);
@@ -526,7 +526,7 @@ browser.tabs.onActivated.addListener((activeInfo) => {
     .then((tabs) => {
       const tab = tabs[0];
       const url = tab.url as string;
-      if (!pages.hasOwnProperty(url)) {
+      if (!Object.hasOwn(pages, url)) {
         logger.log('query tab pin state on activated');
         attemptPageAction(tab);
         setPageInfo(tab);

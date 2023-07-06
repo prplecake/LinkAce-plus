@@ -513,11 +513,11 @@ const postSubmit = () => {
   renderLoading();
 
   const info: Link = {
-    url: $("#url").val() as string,
-    title: $("#title").val() as string,
-    description: $("#desc").val() as string,
+    url: $('#url').val() as string,
+    title: $('#title').val() as string,
+    description: $('#desc').val() as string,
     lists: $('#list').val() as string,
-    tags: $("#tag").val() as string,
+    tags: $('#tag').val() as string,
   };
   logger.log('link info: ', info);
 
@@ -540,8 +540,8 @@ const postDelete = () => {
     });
 };
 
-$("#linkAceUrl").on("keyup", () => {
-  const val = $("#linkAceUrl").val();
+$('#linkAceUrl').on('keyup', () => {
+  const val = $('#linkAceUrl').val();
   logger.log(val);
   $('#linkAceSettingsUrl').attr('href', `${val}/settings`);
 });
