@@ -276,47 +276,67 @@ const getSearchPath = (url: string) => {
   });
 };
 
-const deletePost = (url: string) => {
+const getLinkId = async (url: string) => {
   const userInfo = getUserInfo();
   if (userInfo && userInfo.isChecked && url) {
-    const path = mainPath + 'posts/delete';
-    const settings: any = {
-      url: path,
-      type: 'GET',
-      timeout: REQ_TIME_OUT,
-      dataType: 'json',
-      crossDomain: true,
-      data: {
-        url: url,
-        format: 'json'
-      },
-      contentType: 'text/plain'
-    };
-    settings.data.auth_token = userInfo.authToken;
-    const jqxhr = $.ajax(settings);
-    jqxhr.always(function (data) {
-      const resCode = data.result_code;
-      if (resCode == 'done' || resCode == 'item not found') {
-        delete pages[url];
-        updateSelectedTabExtIcon();
-        browser.runtime.sendMessage({
-          type: 'deletepost-succeed'
-        });
-      } else {
-        browser.runtime.sendMessage({
-          type: 'deletepost-failed',
-          error: 'Delete failed: ' + data.result_code
-        });
+    const path = getSearchPath(url),
+      options = {
+        method: 'GET',
+        headers: new Headers({
+          Authorization: `Bearer ${userInfo.authToken}`,
+          Accept: 'application/json'
+        })
+      };
+    return await fetch(path, options).then(response => {
+      if (response.ok) {
+        return response.json();
       }
-    });
-    jqxhr.fail(function (data) {
-      browser.runtime.sendMessage({
-        type: 'deletepost-failed',
-        error: 'Delete failed: ' + data.statusText
-      });
     });
   }
 };
+
+const deletePost = (url: string) => {
+  const userInfo = getUserInfo();
+  if (userInfo && userInfo.isChecked && url) {
+    getLinkId(url).then(data => {
+      console.log(data);
+      const result = data.data.find((item: any) => {
+        return item.url === url;
+      });
+      const linkId = result.id;
+      console.log('linkId: ', linkId);
+      const path = mainPath + 'links/' + linkId,
+        options = {
+          method: 'DELETE',
+          headers: new Headers({
+            Authorization: `Bearer ${userInfo.authToken}`
+          })
+        };
+      fetch(path, options)
+        .then((response) => {
+          if (response.ok) {
+            delete pages[url];
+            updateSelectedTabExtIcon();
+            browser.runtime.sendMessage({
+              type: 'deletepost-succeed'
+            });
+          } else {
+            browser.runtime.sendMessage({
+              type: 'deletepost-failed',
+              error: 'Delete failed: ' + response.statusText
+            });
+          }
+        })
+        .catch((reason) => {
+          browser.runtime.sendMessage({
+            type: 'deletepost-failed',
+            error: 'Delete failed: ' + reason
+          });
+        });
+    });
+  }
+};
+window.deletePost = deletePost;
 
 const arraysEqual = function (_arr1: any[], _arr2: any[]) {
   if (!Array.isArray(_arr1) || !Array.isArray(
