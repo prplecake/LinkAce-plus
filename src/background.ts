@@ -157,7 +157,7 @@ const queryPinState = (info: PageStateInfo) => {
   if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
     info.url && url && validProto(url)) {
     isQuerying = true;
-    const path = mainPath + 'search/links',
+    const path = getSearchPath(url),
       options = {
         method: 'GET',
         headers: new Headers({
@@ -268,6 +268,13 @@ const addPost = (info: any) => {
   }
 };
 window.addPost = addPost;
+
+const getSearchPath = (url: string) => {
+  return mainPath + 'search/links?' + new URLSearchParams({
+    per_page: '-1',
+    query: url,
+  });
+};
 
 const deletePost = (url: string) => {
   const userInfo = getUserInfo();
