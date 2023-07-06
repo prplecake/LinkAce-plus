@@ -193,11 +193,6 @@ const updateSelectedTabExtIcon = () => {
       } else if (pageInfo && pageInfo.isSaving) {
         iconPath = savingIcon;
       }
-      browser.browserAction.setIcon(
-        {
-          path: iconPath,
-          tabId: tab.id
-        });
       browser.pageAction.setIcon(
         {
           path: iconPath,
@@ -444,21 +439,12 @@ browser.tabs.query({
       url: tab.url,
       ready: (pageInfo: PageInfo) => {
         if (pageInfo && pageInfo.isSaved) {
-          browser.browserAction.setIcon(
-            {
-              path: yesIcon,
-              tabId: tab.id
-            });
           browser.pageAction.setIcon(
             {
               path: yesIcon,
               tabId: tab.id as number
             });
         } else {
-          browser.browserAction.setIcon({
-            path: noIcon,
-            tabId: tab.id
-          });
           browser.pageAction.setIcon({
             path: noIcon,
             tabId: tab.id as number
@@ -476,19 +462,15 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     const url = changeInfo.url;
     if (!pages.hasOwnProperty(url)) {
       console.log('query tab pin state on updated');
-      browser.browserAction.setIcon({ path: noIcon, tabId: tab.id });
       attemptPageAction(tab);
       setPageInfo(tab);
       queryPinState({
         url: url,
         ready: function (pageInfo: PageInfo) {
           if (pageInfo && pageInfo.isSaved) {
-            browser.browserAction.setIcon(
-              { path: yesIcon, tabId: tab.id });
             browser.pageAction.setIcon(
               { path: yesIcon, tabId: tab.id as number });
           } else {
-            browser.browserAction.setIcon({path: noIcon, tabId: tab.id});
             browser.pageAction.setIcon({path: noIcon, tabId: tab.id as number});
           }
         }
@@ -499,7 +481,6 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
   const url = String(changeInfo.url || tab.url);
   attemptPageAction(tab);
   if (pages[url] && pages[url].isSaved) {
-    browser.browserAction.setIcon({ path: yesIcon, tabId: tab.id });
     browser.pageAction.setIcon({ path: yesIcon, tabId: tab.id as number });
   }
 });
@@ -523,21 +504,12 @@ browser.tabs.onActivated.addListener((activeInfo) => {
           url: url,
           ready: (pageInfo: PageInfo) => {
             if (pageInfo && pageInfo.isSaved) {
-              browser.browserAction.setIcon(
-                {
-                  path: yesIcon,
-                  tabId: tab.id
-                });
               browser.pageAction.setIcon(
                 {
                   path: yesIcon,
                   tabId: tab.id as number
                 });
             } else {
-              browser.browserAction.setIcon({
-                path: noIcon,
-                tabId: tab.id
-              });
               browser.pageAction.setIcon({
                 path: noIcon,
                 tabId: tab.id as number
