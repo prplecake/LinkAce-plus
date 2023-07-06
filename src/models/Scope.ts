@@ -16,6 +16,11 @@ export interface PageInfo {
   time?: number,
 }
 
+export interface PageStateInfo extends PageInfo {
+  ready: any,
+  isForce?: boolean
+}
+
 interface AutoCompleteItem {
   text: string,
   isActive: boolean

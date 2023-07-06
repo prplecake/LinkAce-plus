@@ -1,11 +1,12 @@
 import $ from 'jquery';
-import {PageInfo, Scope} from "../models/Scope";
-import {maxDescLen, StorageKeys} from "../common";
-import {Link} from "../models/LinkAce/Link";
+import {PageInfo, Scope} from '../models/Scope';
+import {maxDescLen, StorageKeys} from '../common';
+import {Link} from '../models/LinkAce/Link';
 import KeyDownEvent = JQuery.KeyDownEvent;
 import './popup.scss';
+import {validProto} from '../lib/utils';
 
-let bg: any = browser.extension.getBackgroundPage(),
+const bg: any = browser.extension.getBackgroundPage(),
   keyCode = {enter: 13, tab: 9, up: 38, down: 40, ctrl: 17, n: 78, p: 80, space: 32},
   SEC = 1000, MIN = SEC * 60, HOUR = MIN * 60, DAY = HOUR * 24, WEEK = DAY * 7;
 
@@ -21,7 +22,7 @@ const requestPermissions = async (url: string) => {
       console.log('permission was refused');
     }
     return browser.permissions.getAll();
-  }
+  };
 
   const response = await browser.permissions.request(permissionsToRequest);
   const currentPermissions = await onResponse(response);
@@ -29,7 +30,7 @@ const requestPermissions = async (url: string) => {
 };
 
 const escapeHTML = function (str: string) {
-  const replacements: { [id: string]: string } = {"&": "&amp;", '"': "&quot;", "'": "&#39;", "<": "&lt;", ">": "&gt;"};
+  const replacements: { [id: string]: string } = {'&': '&amp;', '"': '&quot;', '\'': '&#39;', '<': '&lt;', '>': '&gt;'};
   return str.replace(/[&"'<>]/g, (m) => replacements[m]);
 };
 
@@ -68,19 +69,19 @@ const renderSavedTime = function (time: number) {
 };
 
 const $scope: Scope = {
-  loadingText: "Loading...",
+  loadingText: 'Loading...',
   userInfo: {},
   pageInfo: {}
 };
 
-const $loading = $("#state-mask").hide();
-const $login = $("#login-window").hide();
-const $bookmark = $("#bookmark-window").hide();
-const $postform = $("#add-post-form").hide();
-const $autocomplete = $("#auto-complete").hide();
+const $loading = $('#state-mask').hide();
+const $login = $('#login-window').hide();
+const $bookmark = $('#bookmark-window').hide();
+const $postform = $('#add-post-form').hide();
+const $autocomplete = $('#auto-complete').hide();
 
 (() => {
-  $("#logo-link").attr('href', localStorage.getItem('linkace_url'));
+  $('#logo-link').attr('href', localStorage.getItem('linkace_url'));
 })();
 
 const renderLoading = function (loadingText?: string) {
@@ -95,35 +96,35 @@ const renderLoading = function (loadingText?: string) {
 renderLoading();
 
 const renderLoginPage = function () {
-  console.log("rendering login page");
+  console.log('rendering login page');
   $login.show();
 
-  const $loginerr = $("#login-error");
+  const $loginerr = $('#login-error');
   if ($scope.isLoginError === true) {
     $loginerr.show();
   } else {
     $loginerr.hide();
   }
 
-  $("#login-btn").off("click").on("click", loginSubmit);
+  $('#login-btn').off('click').on('click', loginSubmit);
 };
 
 browser.runtime.onMessage.addListener((message: any) => {
-  console.log("receive message: " + JSON.stringify(message))
-  if (message.type === "login-succeed") {
+  console.log('receive message: ' + JSON.stringify(message));
+  if (message.type === 'login-succeed') {
     $scope.isLoading = false;
     $scope.isLoginError = false;
 
     renderUserInfo();
     $loading.hide();
     renderBookmarkPage();
-  } else if (message.type === "login-failed") {
+  } else if (message.type === 'login-failed') {
     $scope.isLoading = false;
     $scope.isLoginError = true;
 
     $loading.hide();
     renderLoginPage();
-  } else if (message.type === "logged-out") {
+  } else if (message.type === 'logged-out') {
     $scope.isAnony = true;
     $scope.isLoading = false;
     $scope.isLoginError = false;
@@ -131,14 +132,17 @@ browser.runtime.onMessage.addListener((message: any) => {
     $bookmark.hide();
     $loading.hide();
     renderLoginPage();
-  } else if (message.type === "render-suggests") {
+  } else if (message.type === 'render-suggests') {
     $scope.suggests = message.data;
     renderSuggest();
-  } else if (message.type === "render-page-info") {
+  } else if (message.type === 'render-page-info') {
     if (message.data) {
-      browser.tabs.query({active: true, currentWindow: true})
+      browser.tabs.query({
+        active: true,
+        currentWindow: true
+      })
         .then((tabs) => {
-          let tab = tabs[0];
+          const tab = tabs[0];
           let pageInfo: PageInfo = message.data;
           if (pageInfo.isSaved == false) {
             pageInfo = {
@@ -156,9 +160,9 @@ browser.runtime.onMessage.addListener((message: any) => {
           pageInfo.isPrivate = !pageInfo.shared;
           $scope.pageInfo = $.extend({}, pageInfo);
 
-          $("#url").val(pageInfo.url as string);
-          $("#title").val(pageInfo.title as string);
-          $("#tag").val(pageInfo.tag as string);
+          $('#url').val(pageInfo.url as string);
+          $('#title').val(pageInfo.title as string);
+          $('#tag').val(pageInfo.tag as string);
           console.log('desc: ', pageInfo.desc);
           if (!pageInfo.desc) {
             // TODO: resolve dependency on chrome
@@ -176,24 +180,24 @@ browser.runtime.onMessage.addListener((message: any) => {
                     desc = desc.slice(0, maxDescLen) + '...';
                   }
                   pageInfo.desc = desc;
-                  $("#desc").val(pageInfo.desc as string);
+                  $('#desc').val(pageInfo.desc as string);
                 }
               }
             );
           } else {
-            $("#desc").val(pageInfo.desc);
+            $('#desc').val(pageInfo.desc);
           }
 
           if (pageInfo.isPrivate) {
-            $("#private").prop('checked', true);
+            $('#private').prop('checked', true);
           }
           if (pageInfo.toread === true) {
-            $("#toread").prop('checked', true);
+            $('#toread').prop('checked', true);
           }
 
           renderError();
 
-          const $savetime = $(".alert-savetime").hide();
+          const $savetime = $('.alert-savetime').hide();
           if (pageInfo.time) {
             $savetime.text(renderSavedTime(pageInfo.time));
             $savetime.show();
@@ -202,38 +206,41 @@ browser.runtime.onMessage.addListener((message: any) => {
           }
 
           if (pageInfo.isSaved === true) {
-            $("#opt-delete").off("click").on("click", function () {
-              $("#opt-cancel-delete").off("click").on("click", function () {
-                $("#opt-confirm").hide();
-                $("#opt-delete").show();
+            $('#opt-delete').off('click').on('click', function () {
+              $('#opt-cancel-delete').off('click').on('click', function () {
+                $('#opt-confirm').hide();
+                $('#opt-delete').show();
                 return false;
               });
 
-              $("#opt-destroy").off("click").on("click", function () {
+              $('#opt-destroy').off('click').on('click', function () {
                 postDelete();
                 return false;
               });
 
-              $("#opt-delete").hide();
-              $("#opt-confirm").show();
+              $('#opt-delete').hide();
+              $('#opt-confirm').show();
               return false;
             }).show();
           }
 
-          $("#tag").off("change keyup paste").on("change keyup paste", function (e) {
-            const code = e.charCode ? e.charCode : e.keyCode;
-            if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
-              keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) === -1) {
-              $scope.pageInfo.tag = $("#tag").val() as string;
-              renderSuggest();
-              showAutoComplete();
-            }
-          }).off("keydown").on("keydown", function (e) {
+          $('#tag').off('change keyup paste')
+            .on('change keyup paste', function (e) {
+              const code = e.charCode ? e.charCode : e.keyCode;
+              if (code && $.inArray(code, [
+                keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
+                keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space
+              ]) === -1) {
+                $scope.pageInfo.tag = $('#tag').val() as string;
+                renderSuggest();
+                showAutoComplete();
+              }
+            }).off('keydown').on('keydown', function (e) {
             chooseTag(e);
             renderSuggest();
           });
 
-          $postform.off("submit").on("submit", function () {
+          $postform.off('submit').on('submit', function () {
             postSubmit();
             return false;
           });
@@ -243,30 +250,30 @@ browser.runtime.onMessage.addListener((message: any) => {
 
           $postform.show();
 
-          $("#tag").focus();
+          $('#tag').focus();
         });
     } else {
-      console.log("query bookmark info error");
+      console.log('query bookmark info error');
       $scope.loadingText = 'Query bookmark info error';
       $scope.isLoading = true;
       renderLoading();
     }
-  } else if (message.type === "addpost-succeed") {
+  } else if (message.type === 'addpost-succeed') {
     $scope.isPostError = false;
     window.close();
-  } else if (message.type === "addpost-failed") {
+  } else if (message.type === 'addpost-failed') {
     $scope.isLoading = false;
     $scope.isPostError = true;
-    $scope.postErrorText = message.error
+    $scope.postErrorText = message.error;
     renderError();
     renderLoading();
-  } else if (message.type === "deletepost-succeed") {
+  } else if (message.type === 'deletepost-succeed') {
     $scope.isPostError = false;
     window.close();
-  } else if (message.type === "deletepost-failed") {
+  } else if (message.type === 'deletepost-failed') {
     $scope.isLoading = false;
     $scope.isPostError = true;
-    $scope.postErrorText = message.error
+    $scope.postErrorText = message.error;
     renderError();
     renderLoading();
   }
@@ -274,7 +281,7 @@ browser.runtime.onMessage.addListener((message: any) => {
 
 const loginSubmit = () => {
   const linkAceUrl = $('#linkAceUrl').val() as string,
-    authToken = $("#token").val() as string;
+    authToken = $('#token').val() as string;
   requestPermissions(linkAceUrl);
   if (linkAceUrl && authToken) {
     $scope.loadingText = 'log in...';
@@ -287,17 +294,17 @@ const loginSubmit = () => {
 };
 
 const renderPageHeader = () => {
-  $(".logout a").on("click", function () {
-    console.log("log out...");
+  $('.logout a').on('click', () => {
+    console.log('log out...');
     $scope.isLoading = true;
-    $scope.loadingText = "Log out...";
+    $scope.loadingText = 'Log out...';
     renderLoading();
     bg.logout();
   });
 };
 
 const renderError = () => {
-  const $posterr = $(".alert-error").hide();
+  const $posterr = $('.alert-error').hide();
   if ($scope.isPostError === true) {
     $posterr.text($scope.postErrorText as string);
     $posterr.show();
@@ -308,14 +315,17 @@ const renderError = () => {
 };
 
 const renderBookmarkPage = () => {
-  console.log("rendering bookmark page");
+  console.log('rendering bookmark page');
   $bookmark.show();
   renderPageHeader();
-  browser.tabs.query({active: true, currentWindow: true})
+  browser.tabs.query({
+    active: true,
+    currentWindow: true
+  })
     .then((tabs) => {
       const tab = tabs[0];
-      if (tab.url!.indexOf("http://") !== 0 && tab.url!.indexOf("https://") !== 0 && tab.url!.indexOf("ftp://") !== 0) {
-        console.log("invalid tab");
+      if (tab.url && !validProto(tab.url)) {
+        console.log('invalid tab');
         $scope.loadingText = 'Please select a valid tab';
         $scope.isLoading = true;
         renderLoading();
@@ -326,13 +336,21 @@ const renderBookmarkPage = () => {
       $scope.isLoading = true;
       renderLoading();
 
-      bg.getPageInfo(tab.url!);
+      bg.getPageInfo(tab.url);
     });
 };
 
+const initAutoComplete = () => {
+  const tags = bg.getTags();
+  if (tags && tags.length) {
+    $scope.allTags = tags;
+  } else {
+    $scope.allTags = [];
+  }
+};
+
 const chooseTag = (e: KeyDownEvent) => {
-  let newItems;
-  let idx;
+  let newItems, idx;
   const code = e.charCode ? e.charCode : e.keyCode;
   if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
     keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) !== -1) {
@@ -344,7 +362,7 @@ const chooseTag = (e: KeyDownEvent) => {
           tag = $scope.autoCompleteItems![$scope.activeItemIndex!];
         items.splice(items.length - 1, 1, tag.text);
         $scope.pageInfo.tag = items.join(' ') + ' ';
-        $("#tag").val($scope.pageInfo.tag);
+        $('#tag').val($scope.pageInfo.tag);
         $scope.isShowAutoComplete = false;
         renderAutoComplete();
       } else if (code == keyCode.enter) {
@@ -393,6 +411,7 @@ const showAutoComplete = () => {
   let word = items[items.length - 1];
   const MAX_SHOWN_ITEMS = 5;
   if (word) {
+    console.log(word);
     word = word.toLowerCase();
     const allTags: string[] = $scope.allTags!;
     let shownCount = 0;
@@ -427,44 +446,44 @@ const showAutoComplete = () => {
 
 const renderAutoComplete = () => {
   if ($scope.isShowAutoComplete === true) {
-    $("#auto-complete ul").html("");
+    $('#auto-complete ul').html('');
     $.each($scope.autoCompleteItems!, function (index, item) {
-      let cls = "";
+      let cls = '';
       if (item.isActive) {
-        cls = "active";
+        cls = 'active';
       }
-      $("#auto-complete ul").append('<li class="' + cls + '">' + escapeHTML(item.text) + '</li>');
+      $('#auto-complete ul').append('<li class="' + cls + '">' + escapeHTML(item.text) + '</li>');
     });
     $autocomplete.show();
   } else {
     $autocomplete.hide();
   }
-}
+};
 
 const renderSuggest = () => {
   if ($scope.suggests && $scope.suggests.length > 0) {
-    $("#suggest").html("");
+    $('#suggest').html('');
     $.each($scope.suggests, function (index, suggest) {
-      let cls = "add-tag";
+      let cls = 'add-tag';
       if ($scope.pageInfo.tag!.split(' ').indexOf(suggest) != -1) {
-        cls += " selected";
+        cls += ' selected';
       }
-      $("#suggest").append('<a href="#" class="' + cls + '">' + escapeHTML(suggest) + '</a>');
+      $('#suggest').append('<a href="#" class="' + cls + '">' + escapeHTML(suggest) + '</a>');
     });
-    $("#suggest").append('<a href="#" class="add-all-tag">Add all</a>')
-    $(".add-tag").off("click").on("click", function () {
+    $('#suggest').append('<a href="#" class="add-all-tag">Add all</a>');
+    $('.add-tag').off('click').on('click', function() {
       const tag = $(this).text();
       addTags([tag]);
-      $(this).addClass("selected");
+      $(this).addClass('selected');
     });
-    $(".add-all-tag").off("click").on("click", function () {
+    $('.add-all-tag').off('click').on('click', ()=> {
       addTags([$scope.suggests as string]); // TODO?
     });
-    $("#suggest-list").show();
+    $('#suggest-list').show();
   } else {
-    $("#suggest-list").hide();
+    $('#suggest-list').hide();
   }
-}
+};
 
 const addTag = (s: string) => {
   const t = $scope.pageInfo.tag!.trim();
@@ -472,7 +491,7 @@ const addTag = (s: string) => {
   if ($.inArray(s, t.split(' ')) === -1) {
     $scope.pageInfo.tag = t + ' ' + s + ' ';
   }
-  $("#tag").val($scope.pageInfo.tag!);
+  $('#tag').val($scope.pageInfo.tag!);
 };
 
 const addTags = (tags: string[]) => {
@@ -482,7 +501,7 @@ const addTags = (tags: string[]) => {
 };
 
 const postSubmit = () => {
-  console.log("post new bookmark");
+  console.log('post new bookmark');
   $scope.isLoading = true;
   $scope.loadingText = 'Saving...';
   $postform.hide();
@@ -504,7 +523,7 @@ const postSubmit = () => {
 };
 
 const postDelete = () => {
-  console.log("delete bookmark");
+  console.log('delete bookmark');
   $scope.isLoading = true;
   $scope.loadingText = 'Deleting...';
   $postform.hide();
@@ -519,23 +538,23 @@ const postDelete = () => {
 };
 
 $("#linkAceUrl").on("keyup", () => {
-  let val = $("#linkAceUrl").val()
+  const val = $("#linkAceUrl").val();
   console.log(val);
   $('#linkAceSettingsUrl').attr('href', `${val}/settings`);
-})
+});
 
-$(".link").on("click", function () {
-  const url = $(this).attr("href");
+$('.link').on('click', function () {
+  const url = $(this).attr('href');
   browser.tabs.query({})
     .then((tabs) => {
-      let index = tabs.length;
+      const index = tabs.length;
       browser.tabs.create({url: url, index: index});
       window.close();
     });
   return false;
 });
 
-$("#option-link").off("click").on("click", function () {
+$('#option-link').off('click').on('click', function() {
   browser.runtime.openOptionsPage();
 });
 
@@ -543,7 +562,7 @@ const renderUserInfo = () => {
   const userInfo = bg.getUserInfo();
   $scope.userInfo = userInfo;
   $scope.isAnony = !userInfo || !userInfo.isChecked;
-}
+};
 
 renderUserInfo();
 $scope.isLoading = false;
