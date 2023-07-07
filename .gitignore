@@ -1,0 +1,16 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+*.zip
+*.xpi
+
+# parcel
+.cache/
+.parcel-cache/
+coverage/
+*.log
+
+.DS_Store
+.idea
