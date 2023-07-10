@@ -25,7 +25,7 @@ ul {
 }
 
 ul li {
-  margin: 0 0 6px 0;
+  margin: 0 0 6px;
   list-style: none;
 }
 
@@ -78,14 +78,6 @@ input[type="submit"] {
   right: 5px;
 }
 
-#header a {
-  color: #AAA;
-}
-
-#header a:hover {
-  color: #11A;
-}
-
 #header .logo {
   float: left;
   padding-top: 2px;
@@ -122,10 +114,6 @@ input[type="submit"] {
   width: 315px;
 }
 
-#add-post-form ul li {
-  clear: both;
-}
-
 #add-post-form input[type="text"], #add-post-form textarea {
   width: 390px;
 }
@@ -156,7 +144,7 @@ input[type="submit"] {
 #auto-complete {
   background-color: #FFF;
   border: 1px solid #AAA;
-  box-shadow: 1px 1px 3px rgba(0, 0, 110, 0.33);
+  box-shadow: 1px 1px 3px rgba(0 0 110 / 33%);
   min-width: 200px;
   position: absolute;
 }
@@ -164,7 +152,7 @@ input[type="submit"] {
 #auto-complete li {
   background-color: #FFF;
   border-bottom: 0 solid #FFF;
-  color: #2255AA;
+  color: #25A;
   margin: 0;
   padding: 3px 5px;
   cursor: pointer;
@@ -177,6 +165,10 @@ input[type="submit"] {
 
 #auto-complete li.exclude {
   display: none;
+}
+
+#add-post-form ul li {
+  clear: both;
 }
 
 #blockquote-hint {
@@ -202,8 +194,16 @@ input[type="submit"] {
   color: #888;
 }
 
+#header a {
+  color: #AAA;
+}
+
+#header a:hover {
+  color: #11A;
+}
+
 #submit {
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
 }
 
 .opt {
