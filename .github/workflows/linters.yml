@@ -6,6 +6,7 @@ on:
       - '.**'
       - '!.github/workflows/linters.yml'
       - '!.eslintrc.json'
+      - '!.stylelintrc.json'
       - 'README.md'
       - 'yarn.lock'
       - 'package.json'
@@ -42,4 +43,32 @@ jobs:
       - name: Analysing the code with eslint
         if: always()
         run: |
-          npm run lint:js
+          yarn lint:js
+
+  stylelint:
+    name: StyleLint (CSS, SCSS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Get npm cache dir
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: |
+          yarn install
+      - name: Analysing the code with stylelint
+        if: always()
+        run: |
+          yarn lint:sass
