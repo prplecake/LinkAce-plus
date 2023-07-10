@@ -8,7 +8,7 @@ const config: Config = {
             tsconfig: 'tsconfig.json'
         }]
     },
-    testEnvironment: 'node',
+    testEnvironment: 'jsdom',
     testRegex: '/tests/.*\\.(test|spec)?\\.ts$',
     moduleFileExtensions: ['ts', 'js', 'json', 'node']
 };
