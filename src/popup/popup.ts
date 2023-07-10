@@ -59,7 +59,6 @@ const getTimePassed = function (date: Date) {
 const renderSavedTime = function (time: number) {
   const passed = getTimePassed(new Date(time));
   let dispStr = "previously saved ";
-  const w = passed.week, d = passed.day, h = passed.hour;
   if (passed.offset > WEEK) {
     dispStr = dispStr.concat(String(passed.week), " ", "weeks ago");
   } else if (passed.offset > DAY) {
