@@ -7,7 +7,8 @@
   "scripts": {
     "build": "webpack --config webpack/webpack.config.ts --env production",
     "dev": "webpack --config webpack/webpack.config.ts --watch --progress",
-    "lint:js": "eslint src/**/*.{ts,tsx}",
+    "lint:js": "eslint src/**/*.ts",
+    "lint:sass": "stylelint \"src/**/*.{css,scss}\"",
     "test": "jest",
     "coverage": "jest --coverage"
   },
