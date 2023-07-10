@@ -26,6 +26,7 @@
     "eslint": "^8.44.0",
     "html-webpack-plugin": "^5.5.3",
     "jest": "^29.6.1",
+    "jest-environment-jsdom": "^29.6.1",
     "jquery": "^3.7.0",
     "mini-css-extract-plugin": "^2.7.6",
     "sass-loader": "^13.3.2",
