@@ -21,7 +21,7 @@
   },
   "rules":{
     "semi": 2,
-    "quotes": ["warn", "double"],
+    "quotes": ["error", "double", { "allowTemplateLiterals": true }],
     "@typescript-eslint/no-non-null-assertion": "off"
   }
 }
