@@ -1,15 +1,8 @@
 name: Linters
 
 on:
-  push:
-    paths-ignore:
-      - '.**'
-      - '!.github/workflows/linters.yml'
-      - '!.eslintrc.json'
-      - '!.stylelintrc.json'
-      - 'README.md'
-      - 'yarn.lock'
-      - 'package.json'
+  pull_request:
+    branches: [master]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
