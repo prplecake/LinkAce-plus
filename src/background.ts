@@ -7,16 +7,16 @@ import {
   savingIcon,
   StorageKeys,
   yesIcon
-} from './common';
-import $ from 'jquery';
+} from "./common";
+import $ from "jquery";
 import Tab = browser.tabs.Tab;
-import {getDefaultHeaders} from './functions/headers';
-import {Logger} from './lib/logger';
-import {getSearchPath} from './functions/path';
+import {getDefaultHeaders} from "./functions/headers";
+import {Logger} from "./lib/logger";
+import {getSearchPath} from "./functions/path";
 
 declare let window: any;
 
-const logger = new Logger('background');
+const logger = new Logger("background");
 
 const pages: { [key: string]: any } = {};
 let _userInfo: any;
@@ -25,7 +25,7 @@ const login = (obj: { url: string, token: string} ) => {
   // test auth
   const path = `${obj.url}/links`,
     options = {
-      method: 'GET',
+      method: "GET",
       headers: getDefaultHeaders(obj.token)
     };
   fetch(path, options)
@@ -39,20 +39,20 @@ const login = (obj: { url: string, token: string} ) => {
         localStorage[StorageKeys.Checked] = true;
 
         browser.runtime.sendMessage({
-          type: 'login-succeed'
+          type: "login-succeed"
         });
         _getTags();
       } else {
         // login error
         browser.runtime.sendMessage({
-          type: 'login-failed'
+          type: "login-failed"
         });
       }
     })
     .catch((data) => {
-      if (data.statusText == 'timeout') {
+      if (data.statusText == "timeout") {
         browser.runtime.sendMessage({
-          type: 'login-failed'
+          type: "login-failed"
         });
       }
     });
@@ -66,7 +66,7 @@ const logout = function () {
   localStorage.removeItem(StorageKeys.AuthToken);
   localStorage.removeItem(StorageKeys.NoPing);
   browser.runtime.sendMessage({
-    type: 'logged-out'
+    type: "logged-out"
   });
 };
 window.logout = logout;
@@ -82,8 +82,8 @@ const getUserInfo = function () {
     } else {
       _userInfo = {
         isChecked: false,
-        authToken: '',
-        name: ''
+        authToken: "",
+        name: ""
       };
     }
   }
@@ -94,8 +94,8 @@ window.getUserInfo = getUserInfo;
 // for popup.html to acquire page info
 // if there is no page info at local then get it from server
 const getPageInfo = function (url: string) {
-  if (!url || (url.indexOf('https://') !== 0 && url.indexOf(
-    'http://') !== 0)) {
+  if (!url || (url.indexOf("https://") !== 0 && url.indexOf(
+    "http://") !== 0)) {
     return {
       url: url,
       isSaved: false
@@ -104,7 +104,7 @@ const getPageInfo = function (url: string) {
   const pageInfo = pages[url];
   if (pageInfo) {
     browser.runtime.sendMessage({
-      type: 'render-page-info',
+      type: "render-page-info",
       data: pageInfo
     });
     return;
@@ -136,44 +136,44 @@ const queryPinState = (info: any) => {
           desc: post.extended,
           tag: post.tags,
           time: post.time,
-          shared: post.shared == 'no' ? false : true,
-          toread: post.toread == 'yes' ? true : false,
+          shared: post.shared == "no" ? false : true,
+          toread: post.toread == "yes" ? true : false,
           isSaved: true
         };
       }
 
       browser.runtime.sendMessage({
-        type: 'render-page-info',
+        type: "render-page-info",
         data: pageInfo
       });
       pages[url] = pageInfo;
       info.ready && info.ready(pageInfo);
     };
   if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
-    info.url && (url.indexOf('https://') === 0 || url.indexOf('http://') === 0)) {
+    info.url && (url.indexOf("https://") === 0 || url.indexOf("http://") === 0)) {
     isQuerying = true;
     const settings: any = {
       url: getSearchPath(url),
-      type: 'GET',
+      type: "GET",
       data: {
         url: url,
-        format: 'json'
+        format: "json"
       },
       // timeout: REQ_TIME_OUT,
-      dataType: 'json',
+      dataType: "json",
       crossDomain: true,
-      contentType: 'text/plain'
+      contentType: "text/plain"
     };
     settings.data.auth_token = userInfo.authToken;
     const jqxhr = $.ajax(settings);
     jqxhr.always(handler);
     jqxhr.fail(function (data) {
       isQuerying = false;
-      if (data.statusText == 'timeout') {
+      if (data.statusText == "timeout") {
         delete pages[url];
       }
       browser.runtime.sendMessage({
-        type: 'render-page-info'
+        type: "render-page-info"
       });
     });
   }
@@ -202,32 +202,32 @@ const addPost = function (info: any) {
   if (userInfo && userInfo.isChecked && info.url && info.title) {
     let desc = info.desc;
     if (desc.length > maxDescLen) {
-      desc = desc.slice(0, maxDescLen) + '...';
+      desc = desc.slice(0, maxDescLen) + "...";
     }
-    const path = mainPath + 'posts/add',
+    const path = mainPath + "posts/add",
       data: any = {
         description: info.title,
         url: info.url,
         extended: desc,
         tags: info.tag,
-        format: 'json'
+        format: "json"
       };
-    info.shared && (data['shared'] = info.shared);
-    info.toread && (data['toread'] = info.toread);
+    info.shared && (data["shared"] = info.shared);
+    info.toread && (data["toread"] = info.toread);
     const settings = {
       url: path,
-      type: 'GET',
+      type: "GET",
       timeout: REQ_TIME_OUT,
-      dataType: 'json',
+      dataType: "json",
       crossDomain: true,
       data: data,
-      contentType: 'text/plain'
+      contentType: "text/plain"
     };
     settings.data.auth_token = userInfo.authToken;
     const jqxhr = $.ajax(settings);
     jqxhr.always(function (data) {
       const resCode = data.result_code;
-      if (resCode == 'done') {
+      if (resCode == "done") {
         // done
         pages[info.url] = {isSaved: true};
         updateSelectedTabExtIcon();
@@ -236,15 +236,15 @@ const addPost = function (info: any) {
           isForce: true
         });
         browser.runtime.sendMessage({
-          type: 'addpost-succeed'
+          type: "addpost-succeed"
         });
       } else {
         // error
         pages[info.url] = {isSaved: false};
         updateSelectedTabExtIcon();
         browser.runtime.sendMessage({
-          type: 'addpost-failed',
-          error: 'Add failed: ' + data.result_code
+          type: "addpost-failed",
+          error: "Add failed: " + data.result_code
         });
       }
     });
@@ -252,15 +252,15 @@ const addPost = function (info: any) {
       pages[info.url] = {isSaved: false};
       updateSelectedTabExtIcon();
       browser.runtime.sendMessage({
-        type: 'addpost-failed',
-        error: 'Add failed: ' + data.statusText
+        type: "addpost-failed",
+        error: "Add failed: " + data.statusText
       });
     });
     // change icon state
     pages[info.url] = {isSaving: true};
     updateSelectedTabExtIcon();
     // add new tags (if any) to _tags
-    const info_tags = info.tag.split(' ').filter(String);
+    const info_tags = info.tag.split(" ").filter(String);
     info_tags.forEach(function (tag: string) {
       if (_tags.indexOf(tag) == -1) {
         _tags.push(tag);
@@ -273,40 +273,40 @@ window.addPost = addPost;
 const deletePost = function (url: string) {
   const userInfo = getUserInfo();
   if (userInfo && userInfo.isChecked && url) {
-    const path = mainPath + 'posts/delete';
+    const path = mainPath + "posts/delete";
     const settings: any = {
       url: path,
-      type: 'GET',
+      type: "GET",
       timeout: REQ_TIME_OUT,
-      dataType: 'json',
+      dataType: "json",
       crossDomain: true,
       data: {
         url: url,
-        format: 'json'
+        format: "json"
       },
-      contentType: 'text/plain'
+      contentType: "text/plain"
     };
     settings.data.auth_token = userInfo.authToken;
     const jqxhr = $.ajax(settings);
     jqxhr.always(function (data) {
       const resCode = data.result_code;
-      if (resCode == 'done' || resCode == 'item not found') {
+      if (resCode == "done" || resCode == "item not found") {
         delete pages[url];
         updateSelectedTabExtIcon();
         browser.runtime.sendMessage({
-          type: 'deletepost-succeed'
+          type: "deletepost-succeed"
         });
       } else {
         browser.runtime.sendMessage({
-          type: 'deletepost-failed',
-          error: 'Delete failed: ' + data.result_code
+          type: "deletepost-failed",
+          error: "Delete failed: " + data.result_code
         });
       }
     });
     jqxhr.fail(function (data) {
       browser.runtime.sendMessage({
-        type: 'deletepost-failed',
-        error: 'Delete failed: ' + data.statusText
+        type: "deletepost-failed",
+        error: "Delete failed: " + data.statusText
       });
     });
   }
@@ -334,18 +334,18 @@ const arraysEqual = function (_arr1: any[], _arr2: any[]) {
 const getSuggest = function (url: string) {
   const userInfo = getUserInfo();
   if (userInfo && userInfo.isChecked && url) {
-    const path = mainPath + 'posts/suggest';
+    const path = mainPath + "posts/suggest";
     const settings: any = {
       url: path,
-      type: 'GET',
+      type: "GET",
       data: {
         url: url,
-        format: 'json'
+        format: "json"
       },
       // timeout: REQ_TIME_OUT,
-      dataType: 'json',
+      dataType: "json",
       crossDomain: true,
-      contentType: 'text/plain'
+      contentType: "text/plain"
     };
     settings.data.auth_token = userInfo.authToken;
     const jqxhr = $.ajax(settings);
@@ -353,11 +353,11 @@ const getSuggest = function (url: string) {
       let popularTags: string[] = [], recommendedTags = [];
       if (data) {
         const default_recommended = [
-          'ifttt', 'twitter', 'facebook', 'WSH', 'objective-c',
-          'twitterlink', '1960s', '@codepo8', 'Aiviq', 'art'
+          "ifttt", "twitter", "facebook", "WSH", "objective-c",
+          "twitterlink", "1960s", "@codepo8", "Aiviq", "art"
         ];
         if (data[0] && arraysEqual(
-            data[0].popular, ['objective-c']) && data[1]
+            data[0].popular, ["objective-c"]) && data[1]
           && arraysEqual(data[1].recommended, default_recommended)) {
           return;
         }
@@ -376,7 +376,7 @@ const getSuggest = function (url: string) {
         }
       });
       browser.runtime.sendMessage({
-        type: 'render-suggests',
+        type: "render-suggests",
         data: suggests
       });
     });
@@ -390,15 +390,15 @@ const _tags: string[] = [],
 const _getTags = () => {
   const userInfo = getUserInfo();
   if (userInfo && userInfo.isChecked && userInfo.authToken) {
-    const path = mainPath + 'tags/get',
+    const path = mainPath + "tags/get",
       settings: any = {
         url: path,
-        type: 'GET',
-        data: {format: 'json'},
+        type: "GET",
+        data: {format: "json"},
         timeout: REQ_TIME_OUT,
-        dataType: 'json',
+        dataType: "json",
         crossDomain: true,
-        contentType: 'text/plain'
+        contentType: "text/plain"
       };
     settings.data.auth_token = userInfo.authToken;
     const jqxhr = $.ajax(settings);
@@ -434,10 +434,10 @@ const getTagsWithCount = function () {
 browser.tabs.query({ active: true, currentWindow: true })
   .then(tabs => {
     const tab = tabs[0];
-    if (localStorage[StorageKeys.NoPing] === 'true') {
+    if (localStorage[StorageKeys.NoPing] === "true") {
       return;
     }
-    logger.log('query tab pin state on loaded');
+    logger.log("query tab pin state on loaded");
     attemptPageAction(tab);
     queryPinState({
       url: tab.url,
@@ -456,13 +456,13 @@ browser.tabs.query({ active: true, currentWindow: true })
   });
 
 browser.tabs.onUpdated.addListener(function (id, changeInfo, tab) {
-  if (localStorage[StorageKeys.NoPing] === 'true') {
+  if (localStorage[StorageKeys.NoPing] === "true") {
     return;
   }
   if (changeInfo.url) {
     const url = changeInfo.url;
     if (!Object.hasOwn(pages, url)) {
-      logger.log('query tab pin state on updated');
+      logger.log("query tab pin state on updated");
       browser.browserAction.setIcon({ path: noIcon, tabId: tab.id });
       attemptPageAction(tab);
       queryPinState({
@@ -481,7 +481,7 @@ browser.tabs.onUpdated.addListener(function (id, changeInfo, tab) {
       });
     }
   }
-  logger.log('set tab pin state on opening');
+  logger.log("set tab pin state on opening");
   const url: string = (changeInfo.url || tab.url) as string;
   attemptPageAction(tab);
   if (pages[url] && pages[url].isSaved) {
@@ -491,7 +491,7 @@ browser.tabs.onUpdated.addListener(function (id, changeInfo, tab) {
 });
 
 browser.tabs.onActivated.addListener(function (activeInfo) {
-  if (localStorage[StorageKeys.NoPing] === 'true') {
+  if (localStorage[StorageKeys.NoPing] === "true") {
     return;
   }
   browser.tabs.query({ active: true, currentWindow: true })
@@ -499,7 +499,7 @@ browser.tabs.onActivated.addListener(function (activeInfo) {
       const tab = tabs[0];
       const url = tab.url as string;
       if (!Object.hasOwn(pages, url)) {
-        logger.log('query tab pin state on actived');
+        logger.log("query tab pin state on actived");
         attemptPageAction(tab);
         queryPinState({
           url: url,
@@ -525,7 +525,7 @@ Do not show if options checkbox is checked or this is an invalid tab.
 */
 function attemptPageAction(tab: Tab) {
   browser.pageAction.hide(tab.id as number);
-  if (localStorage[StorageKeys.NoPageAction] !== 'true' && tab.url && (tab.url.indexOf('http://') !== -1 || tab.url.indexOf('https://') !== -1)) {
+  if (localStorage[StorageKeys.NoPageAction] !== "true" && tab.url && (tab.url.indexOf("http://") !== -1 || tab.url.indexOf("https://") !== -1)) {
     browser.pageAction.show(tab.id as number);
   }
 }
