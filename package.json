@@ -13,7 +13,7 @@
     "coverage": "jest --coverage"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.254",
+    "@types/chrome": "^0.0.256",
     "@types/firefox-webext-browser": "^120.0.0",
     "@types/jest": "^29.5.11",
     "@types/jquery": "^3.5.29",
