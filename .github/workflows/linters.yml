@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+      - run: corepack enable
       - name: Get npm cache dir
         id: npm-cache-dir
         shell: bash
@@ -47,10 +48,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+      - run: corepack enable
       - name: Get npm cache dir
         id: npm-cache-dir
         shell: bash
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
       - uses: actions/cache@v3
         id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
         with:
