@@ -18,7 +18,7 @@
     "@types/jest": "^29.5.11",
     "@types/jquery": "^3.5.29",
     "@types/node": "^20.10.7",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/eslint-plugin": "^6.18.1",
     "@typescript-eslint/parser": "^5.62.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
