@@ -1317,12 +1317,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.10.7":
-  version: 20.11.0
-  resolution: "@types/node@npm:20.11.0"
+"@types/node@npm:^20.11.2":
+  version: 20.11.2
+  resolution: "@types/node@npm:20.11.2"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 560aa850dfccb83326f9cba125459f6c3fb0c71ec78f22c61e4d248f1df78bd25fd6792cef573dfbdc49c882f8e38bb1a82ca87e0e28ff2513629c704c2b02af
+  checksum: 11a935f6676f78e1ced4805f9653891d1fc78ecafd78c7352d289be8c1829c88ebfe45ffd6b4687bbfc73edd0e177746d8cefff651a9f13199ac2dd3ca1076b7
   languageName: node
   linkType: hard
 
@@ -4901,7 +4901,7 @@ __metadata:
     "@types/firefox-webext-browser": "npm:^120.0.0"
     "@types/jest": "npm:^29.5.11"
     "@types/jquery": "npm:^3.5.29"
-    "@types/node": "npm:^20.10.7"
+    "@types/node": "npm:^20.11.2"
     "@typescript-eslint/eslint-plugin": "npm:^5.62.0"
     "@typescript-eslint/parser": "npm:^5.62.0"
     copy-webpack-plugin: "npm:^11.0.0"
