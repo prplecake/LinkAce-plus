@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.268",
-    "@types/firefox-webext-browser": "^120.0.3",
+    "@types/firefox-webext-browser": "^120.0.4",
     "@types/jest": "^29.5.12",
     "@types/jquery": "^3.5.30",
     "@types/node": "^20.14.10",
