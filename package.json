@@ -15,7 +15,7 @@
   "devDependencies": {
     "@types/chrome": "^0.0.273",
     "@types/firefox-webext-browser": "^120.0.4",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^29.5.13",
     "@types/jquery": "^3.5.31",
     "@types/node": "^22.7.4",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
