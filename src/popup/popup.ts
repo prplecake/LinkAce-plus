@@ -100,6 +100,9 @@ renderLoading();
 const renderLoginPage = () => {
   logger.log("rendering login page");
   $login.show();
+  if (localStorage[StorageKeys.Url]) {
+    $("#linkace_url").val(localStorage[StorageKeys.Url]);
+  }
 
   const $loginerr = $("#login-error");
   if ($scope.isLoginError === true) {
@@ -541,6 +544,7 @@ $("#linkace_url").on("keyup", () => {
   const val = $("#linkace_url").val();
   logger.log(val);
   $("#linkace_settings_url").attr("href", `${val}/settings`);
+  localStorage[StorageKeys.Url] = val;
 });
 
 $(".link").on("click", function() {
