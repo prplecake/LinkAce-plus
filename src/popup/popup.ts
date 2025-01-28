@@ -160,8 +160,6 @@ browser.runtime.onMessage.addListener(function(message){
           pageInfo.isPrivate = !pageInfo.shared;
           $scope.pageInfo = $.extend({}, pageInfo);
           initAutoComplete();
-          logger.log("get tag suggesting");
-          bg.getSuggest(tab.url);
 
           $("#url").val(pageInfo.url);
           $("#title").val(pageInfo.title);

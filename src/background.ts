@@ -331,59 +331,6 @@ const arraysEqual = function (_arr1: any[], _arr2: any[]) {
   return true;
 };
 
-const getSuggest = function (url: string) {
-  const userInfo = getUserInfo();
-  if (userInfo && userInfo.isChecked && url) {
-    const path = mainPath + "posts/suggest";
-    const settings: any = {
-      url: path,
-      type: "GET",
-      data: {
-        url: url,
-        format: "json"
-      },
-      // timeout: REQ_TIME_OUT,
-      dataType: "json",
-      crossDomain: true,
-      contentType: "text/plain"
-    };
-    settings.data.auth_token = userInfo.authToken;
-    const jqxhr = $.ajax(settings);
-    jqxhr.always(function (data) {
-      let popularTags: string[] = [], recommendedTags = [];
-      if (data) {
-        const default_recommended = [
-          "ifttt", "twitter", "facebook", "WSH", "objective-c",
-          "twitterlink", "1960s", "@codepo8", "Aiviq", "art"
-        ];
-        if (data[0] && arraysEqual(
-            data[0].popular, ["objective-c"]) && data[1]
-          && arraysEqual(data[1].recommended, default_recommended)) {
-          return;
-        }
-        if (data[0]) {
-          popularTags = data[0].popular;
-        }
-        if (data[1]) {
-          recommendedTags = data[1].recommended;
-        }
-      }
-      // default to popluar tags, add new recommended tags
-      const suggests = popularTags.slice();
-      $.each(recommendedTags, function (index, tag) {
-        if (popularTags.indexOf(tag) === -1) {
-          suggests.push(tag);
-        }
-      });
-      browser.runtime.sendMessage({
-        type: "render-suggests",
-        data: suggests
-      });
-    });
-  }
-};
-window.getSuggest = getSuggest;
-
 const _tags: string[] = [],
   _tagsWithCount = {};
 // acquire all user tags from server refresh _tags
