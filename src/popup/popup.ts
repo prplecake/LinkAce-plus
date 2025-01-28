@@ -412,8 +412,8 @@ const showAutoComplete = () => {
     let i = 0;
     const len = allTags.length;
     for (; i < len && shownCount < MAX_SHOWN_ITEMS; i++) {
-      const tag = allTags[i];
-      if (tag.indexOf(word) == 0 && $.inArray(tag, items) === -1) {
+      const tag = allTags[i].name;
+      if (tag.indexOf(word) !== -1 && $.inArray(tag, items) === -1) {
         const item = {
           text: tag,
           isActive: false

@@ -337,30 +337,29 @@ const _tags: string[] = [],
 const _getTags = () => {
   const userInfo = getUserInfo();
   if (userInfo && userInfo.isChecked && userInfo.authToken) {
-    const path = mainPath + "tags/get",
+    const path = mainPath + "tags",
       settings: any = {
         url: path,
         type: "GET",
-        data: {format: "json"},
         timeout: REQ_TIME_OUT,
         dataType: "json",
         crossDomain: true,
-        contentType: "text/plain"
+        headers: getDefaultHeaders(userInfo),
       };
-    settings.data.auth_token = userInfo.authToken;
     const jqxhr = $.ajax(settings);
     jqxhr.always(function (data) {
-      if (data) {
+      if (data && data.data) {
+        const tags = data.data;
         const sortTags = [];
-        for (const t in data) {
-          sortTags.push([t, data[t]]);
+        for (const t in tags) {
+          sortTags.push([t, tags[t]]);
         }
         sortTags.sort(function (a, b) {
           return b[1] - a[1];
         });
 
         for (const i in sortTags) {
-          _tags.push(sortTags[i][0]);
+          _tags.push(sortTags[i][1]);
         }
       }
     });
