@@ -281,12 +281,13 @@ browser.runtime.onMessage.addListener(function(message){
 
 const loginSubmit = () => {
   const authToken = $("#token").val();
+  const url = $("#linkace_url").val();
   if (authToken) {
     $scope.loadingText = "log in...";
     $scope.isLoading = true;
     $login.hide();
     renderLoading();
-    bg.login(authToken);
+    bg.login({url, token: authToken});
     return false;
   }
 };

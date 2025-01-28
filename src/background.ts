@@ -26,7 +26,7 @@ const login = (obj: { url: string, token: string} ) => {
   const path = `${obj.url}/api/v1/links`,
     options = {
       method: "GET",
-      headers: getDefaultHeaders(obj.token)
+      headers: getDefaultHeaders(null, obj.token)
     };
   fetch(path, options)
     .then(response => {
@@ -162,7 +162,7 @@ const queryPinState = (info: any) => {
       // timeout: REQ_TIME_OUT,
       dataType: "json",
       crossDomain: true,
-      contentType: "text/plain"
+      headers: getDefaultHeaders(userInfo),
     };
     settings.data.auth_token = userInfo.authToken;
     const jqxhr = $.ajax(settings);
@@ -221,7 +221,8 @@ const addPost = function (info: any) {
       dataType: "json",
       crossDomain: true,
       data: data,
-      contentType: "text/plain"
+      contentType: "application/json",
+      headers: getDefaultHeaders(userInfo),
     };
     settings.data.auth_token = userInfo.authToken;
     const jqxhr = $.ajax(settings);
