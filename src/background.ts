@@ -128,7 +128,7 @@ const queryPinState = (info: any) => {
       isQuerying = false;
       const posts = data.posts;
       let pageInfo: any = {isSaved: false};
-      if (posts.length) {
+      if (posts && posts.length) {
         const post = posts[0];
         pageInfo = {
           url: post.href,
