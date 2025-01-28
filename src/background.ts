@@ -23,7 +23,7 @@ let _userInfo: any;
 
 const login = (obj: { url: string, token: string} ) => {
   // test auth
-  const path = `${obj.url}/links`,
+  const path = `${obj.url}/api/v1/links`,
     options = {
       method: "GET",
       headers: getDefaultHeaders(obj.token)
@@ -204,7 +204,7 @@ const addPost = function (info: any) {
     if (desc.length > maxDescLen) {
       desc = desc.slice(0, maxDescLen) + "...";
     }
-    const path = mainPath + "posts/add",
+    const path = mainPath + "links",
       data: any = {
         description: info.title,
         url: info.url,
