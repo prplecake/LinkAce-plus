@@ -1,32 +1,25 @@
 // {url: {title, desc, tag, time, isSaved, isSaving}}
-import {
-  mainPath,
-  maxDescLen,
-  noIcon,
-  REQ_TIME_OUT,
-  savingIcon,
-  StorageKeys,
-  yesIcon
-} from "./common";
+import {mainPath, maxDescLen, noIcon, REQ_TIME_OUT, savingIcon, StorageKeys, yesIcon} from "./common";
 import $ from "jquery";
-import Tab = browser.tabs.Tab;
 import {getDefaultHeaders} from "./functions/headers";
 import {Logger} from "./lib/logger";
 import {getSearchPath} from "./functions/path";
+import Tab = browser.tabs.Tab;
+import {SnakeCaseReplacer} from "./lib/json";
 
-declare let window: any;
+declare let window: Window;
 
 const logger = new Logger("background");
 
 const pages: { [key: string]: any } = {};
-let _userInfo: any;
+let _userInfo: UserInfo;
 
 const login = (obj: { url: string, token: string} ) => {
   // test auth
   const path = `${obj.url}/api/v1/links`,
     options = {
       method: "GET",
-      headers: getDefaultHeaders(null, obj.token)
+      headers: getDefaultHeaders(undefined, obj.token)
     };
   fetch(path, options)
     .then(response => {
@@ -71,7 +64,7 @@ const logout = function () {
 };
 window.logout = logout;
 
-const getUserInfo = function () {
+const getUserInfo = function (): UserInfo {
   if (!_userInfo) {
     if (localStorage[StorageKeys.Checked]) {
       _userInfo = {
@@ -113,69 +106,59 @@ const getPageInfo = function (url: string) {
   const cb = function () {
     updateSelectedTabExtIcon();
   };
-  queryPinState({
-    url: url,
-    ready: cb
-  });
+  queryPinState({url: url, callback: cb});
 };
 window.getPageInfo = getPageInfo;
 
 let isQuerying = false;
-const queryPinState = (info: any) => {
-  const userInfo = getUserInfo(),
-    url = info.url,
-    handler = function (data: any) {
-      isQuerying = false;
-      const posts = data.posts;
-      let pageInfo: any = {isSaved: false};
-      if (posts && posts.length) {
-        const post = posts[0];
-        pageInfo = {
-          url: post.href,
-          title: post.description,
-          desc: post.extended,
-          tag: post.tags,
-          time: post.time,
-          shared: post.shared == "no" ? false : true,
-          toread: post.toread == "yes" ? true : false,
-          isSaved: true
-        };
-      }
-
-      browser.runtime.sendMessage({
-        type: "render-page-info",
-        data: pageInfo
-      });
-      pages[url] = pageInfo;
-      info.ready && info.ready(pageInfo);
-    };
-  if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
-    info.url && (url.indexOf("https://") === 0 || url.indexOf("http://") === 0)) {
+const queryPinState = (params: QueryStateParameters) => {
+  const {url, isForce, callback} = params;
+  const userInfo = getUserInfo();
+  if ((isForce || !isQuerying) && userInfo && userInfo.isChecked &&
+    url && (url.indexOf("https://") === 0 || url.indexOf("http://") === 0)) {
     isQuerying = true;
-    const settings: any = {
-      url: getSearchPath(url),
-      type: "GET",
-      data: {
-        url: url,
-        format: "json"
-      },
-      // timeout: REQ_TIME_OUT,
-      dataType: "json",
-      crossDomain: true,
-      headers: getDefaultHeaders(userInfo),
+    const options = {
+      method: "GET",
+      headers: getDefaultHeaders(userInfo)
     };
-    settings.data.auth_token = userInfo.authToken;
-    const jqxhr = $.ajax(settings);
-    jqxhr.always(handler);
-    jqxhr.fail(function (data) {
-      isQuerying = false;
-      if (data.statusText == "timeout") {
-        delete pages[url];
-      }
-      browser.runtime.sendMessage({
-        type: "render-page-info"
+    fetch(getSearchPath(url), options)
+      .then(async response => {
+        console.log(response);
+        const json = await response.json();
+        console.log(json);
+        const data = json.data;
+        isQuerying = false;
+        const posts = data.posts;
+        let pageInfo: PageInfo = {isSaved: false};
+        if (posts && posts.length) {
+          const post = posts[0];
+          pageInfo = {
+            url: post.href,
+            title: post.description,
+            description: post.extended,
+            tags: post.tags,
+            time: post.created_at,
+            isPrivate: post.is_private,
+            isSaved: true
+          };
+        }
+
+        browser.runtime.sendMessage({
+          type: "render-page-info",
+          data: pageInfo
+        });
+        pages[url] = pageInfo;
+        callback && callback(pageInfo);
+      })
+      .catch((data) => {
+        isQuerying = false;
+        if (data.statusText == "timeout") {
+          delete pages[url];
+        }
+        browser.runtime.sendMessage({
+          type: "render-page-info"
+        });
       });
-    });
   }
 };
 
@@ -197,43 +180,36 @@ const updateSelectedTabExtIcon = () => {
     });
 };
 
-const addPost = function (info: any) {
+
+const addPost = function (info: PageInfo) {
   const userInfo = getUserInfo();
   if (userInfo && userInfo.isChecked && info.url && info.title) {
-    let desc = info.desc;
-    if (desc.length > maxDescLen) {
-      desc = desc.slice(0, maxDescLen) + "...";
-    }
     const path = mainPath + "links",
-      data: any = {
-        description: info.title,
+      data: PageInfo = {
         url: info.url,
-        extended: desc,
-        tags: info.tag,
-        format: "json"
+        isPrivate: info.isPrivate,
+        checkDisabled: info.checkDisabled
       };
-    info.shared && (data["shared"] = info.shared);
-    info.toread && (data["toread"] = info.toread);
-    const settings = {
-      url: path,
-      type: "GET",
-      timeout: REQ_TIME_OUT,
-      dataType: "json",
-      crossDomain: true,
-      data: data,
-      contentType: "application/json",
+    info.title && (data.title = info.title);
+    info.description && (data.description = info.description);
+    if (info.tags && info.tags.length > 0 && info.tags[0] !== "") {
+      data.tags = info.tags;
+    }
+    const options = {
+      method: "POST",
       headers: getDefaultHeaders(userInfo),
+      body: JSON.stringify(data, SnakeCaseReplacer)
     };
-    settings.data.auth_token = userInfo.authToken;
-    const jqxhr = $.ajax(settings);
-    jqxhr.always(function (data) {
-      const resCode = data.result_code;
-      if (resCode == "done") {
+    fetch(path, options)
+      .then(async response => {
+      console.log(response);
+      const json = await response.json();
+      if (response.ok) {
         // done
-        pages[info.url] = {isSaved: true};
+        pages[info.url as string] = {isSaved: true};
         updateSelectedTabExtIcon();
         queryPinState({
-          url: info.url,
+          url: info.url as string,
           isForce: true
         });
         browser.runtime.sendMessage({
@@ -241,27 +217,26 @@ const addPost = function (info: any) {
         });
       } else {
         // error
-        pages[info.url] = {isSaved: false};
+        pages[info.url as string] = {isSaved: false};
         updateSelectedTabExtIcon();
         browser.runtime.sendMessage({
           type: "addpost-failed",
-          error: "Add failed: " + data.result_code
+          error: "Add failed: " + json.message
         });
       }
-    });
-    jqxhr.fail(function (data) {
-      pages[info.url] = {isSaved: false};
+    }).catch((data) => {
+      pages[info.url as string] = {isSaved: false};
       updateSelectedTabExtIcon();
       browser.runtime.sendMessage({
         type: "addpost-failed",
-        error: "Add failed: " + data.statusText
+        error: "Add failed: " + data.message
       });
     });
     // change icon state
     pages[info.url] = {isSaving: true};
     updateSelectedTabExtIcon();
     // add new tags (if any) to _tags
-    const info_tags = info.tag.split(" ").filter(String);
+    const info_tags = info.tags ? info.tags.toString().split(" ").filter(String) : [];
     info_tags.forEach(function (tag: string) {
       if (_tags.indexOf(tag) == -1) {
         _tags.push(tag);
@@ -339,7 +314,7 @@ const _getTags = () => {
   const userInfo = getUserInfo();
   if (userInfo && userInfo.isChecked && userInfo.authToken) {
     const path = mainPath + "tags",
-      settings: any = {
+      settings: JQueryAjaxSettings = {
         url: path,
         type: "GET",
         timeout: REQ_TIME_OUT,
@@ -348,7 +323,7 @@ const _getTags = () => {
         headers: getDefaultHeaders(userInfo),
       };
     const jqxhr = $.ajax(settings);
-    jqxhr.always(function (data) {
+    jqxhr.always(function (data: any) {
       if (data && data.data) {
         const tags = data.data;
         const sortTags = [];
@@ -387,8 +362,8 @@ browser.tabs.query({ active: true, currentWindow: true })
     logger.log("query tab pin state on loaded");
     attemptPageAction(tab);
     queryPinState({
-      url: tab.url,
-      ready: function (pageInfo: any) {
+      url: tab.url as string,
+      callback: (pageInfo: PageInfo) => {
         if (pageInfo && pageInfo.isSaved) {
           browser.browserAction.setIcon(
             { path: yesIcon, tabId: tab.id });
@@ -414,7 +389,7 @@ browser.tabs.onUpdated.addListener(function (id, changeInfo, tab) {
       attemptPageAction(tab);
       queryPinState({
         url: url,
-        ready: function (pageInfo: any) {
+        callback: (pageInfo: PageInfo)=> {
           if (pageInfo && pageInfo.isSaved) {
             browser.browserAction.setIcon(
               { path: yesIcon, tabId: tab.id });
@@ -450,7 +425,7 @@ browser.tabs.onActivated.addListener(function (activeInfo) {
         attemptPageAction(tab);
         queryPinState({
           url: url,
-          ready: function (pageInfo: any) {
+          callback: (pageInfo: PageInfo)=> {
             if (pageInfo && pageInfo.isSaved) {
               browser.browserAction.setIcon(
                 { path: yesIcon, tabId: tab.id });

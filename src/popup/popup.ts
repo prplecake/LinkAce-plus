@@ -6,7 +6,7 @@ import KeyDownEvent = JQuery.KeyDownEvent;
 
 const logger = new Logger("popup");
 
-const bg: any = browser.extension.getBackgroundPage(),
+const bg: Window = browser.extension.getBackgroundPage()!,
   keyCode = {
     enter: 13,
     tab: 9,
@@ -71,10 +71,8 @@ const renderSavedTime = function (time: number) {
   return dispStr;
 };
 
-const $scope: any = {
+const $scope: Scope = {
   "loadingText": "Loading...",
-  "userInfo": {},
-  "pageInfo": {}
 };
 const $loading = $("#state-mask").hide();
 const $login = $("#login-window").hide();
@@ -231,7 +229,7 @@ browser.runtime.onMessage.addListener(function(message){
             const code = e.charCode ? e.charCode : e.keyCode;
             if (code && $.inArray(code, [keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
               keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space]) === -1) {
-              $scope.pageInfo.tag = $("#tag").val();
+              $scope.pageInfo && ($scope.pageInfo.tags = $("#tag").val()?.toString().split(" "));
               renderSuggest();
               showAutoComplete();
             }
@@ -280,8 +278,8 @@ browser.runtime.onMessage.addListener(function(message){
 });
 
 const loginSubmit = () => {
-  const authToken = $("#token").val();
-  const url = $("#linkace_url").val();
+  const authToken = $("#token").val() as string;
+  const url = $("#linkace_url").val() as string;
   if (authToken) {
     $scope.loadingText = "log in...";
     $scope.isLoading = true;
@@ -293,7 +291,7 @@ const loginSubmit = () => {
 };
 
 const renderPageHeader = () => {
-  $("#username").text($scope.userInfo.name);
+  $("#username").text($scope.userInfo?.name as string);
 
   $(".logout a").on("click", function () {
     logger.log("log out...");
@@ -307,7 +305,7 @@ const renderPageHeader = () => {
 const renderError = () => {
   const $posterr = $(".alert-error").hide();
   if ($scope.isPostError === true) {
-    $posterr.text($scope.postErrorText);
+    $posterr.text($scope.postErrorText as string);
     $posterr.show();
     $postform.show();
   } else {
@@ -334,7 +332,7 @@ const renderBookmarkPage = () => {
     $scope.isLoading = true;
     renderLoading();
 
-    bg.getPageInfo(tab.url);
+    bg.getPageInfo(tab.url as string);
   });
 };
 
@@ -355,11 +353,11 @@ const chooseTag = function (e: KeyDownEvent) {
       if ($scope.isShowAutoComplete) {
         e.preventDefault();
         // submit tag
-        const items = $scope.pageInfo.tag.split(" "),
-          tag = $scope.autoCompleteItems[$scope.activeItemIndex];
-        items.splice(items.length - 1, 1, tag.text);
-        $scope.pageInfo.tag = items.join(" ") + " ";
-        $("#tag").val($scope.pageInfo.tag);
+        const items = $scope.pageInfo?.tags,
+          tag = $scope.autoCompleteItems[$scope.activeItemIndex as number];
+        items?.splice(items.length - 1, 1, tag.text);
+        $scope.pageInfo && ($scope.pageInfo.tags = items);
+        $("#tag").val($scope.pageInfo?.tags?.join(" ") + "");
         $scope.isShowAutoComplete = false;
         renderAutoComplete();
       } else if (code == keyCode.enter) {
@@ -370,7 +368,7 @@ const chooseTag = function (e: KeyDownEvent) {
       (code == keyCode.n && e.ctrlKey == true)) {
       // move up one item
       e.preventDefault();
-      let idx = $scope.activeItemIndex + 1;
+      let idx = ($scope.activeItemIndex as number) + 1;
       if (idx >= $scope.autoCompleteItems.length) {
         idx = 0;
       }
@@ -385,7 +383,7 @@ const chooseTag = function (e: KeyDownEvent) {
       (code == keyCode.p && e.ctrlKey == true)) {
       // move down one item
       e.preventDefault();
-      let idx = $scope.activeItemIndex - 1;
+      let idx = ($scope.activeItemIndex as number) - 1;
       if (idx < 0) {
         idx = $scope.autoCompleteItems.length - 1;
       }
@@ -404,7 +402,7 @@ const chooseTag = function (e: KeyDownEvent) {
 };
 
 const showAutoComplete = () => {
-  const items = $scope.pageInfo.tag.split(" ");
+  const items = $scope.pageInfo?.tags as string[];
   let word = items[items.length - 1];
   const MAX_SHOWN_ITEMS = 5;
   if (word) {
@@ -414,9 +412,9 @@ const showAutoComplete = () => {
     let shownCount = 0;
     const autoCompleteItems = [];
     let i = 0;
-    const len = allTags.length;
+    const len = allTags?.length as number;
     for (; i < len && shownCount < MAX_SHOWN_ITEMS; i++) {
-      const tag = allTags[i].name;
+      const tag = allTags![i];
       if (tag.indexOf(word) !== -1 && $.inArray(tag, items) === -1) {
         const item = {
           text: tag,
@@ -470,7 +468,7 @@ const renderSuggest = () => {
     $("#suggest").html("");
     $.each($scope.suggests, function (index, suggest) {
       let cls = "add-tag";
-      if ($scope.pageInfo.tag.split(" ").indexOf(suggest) != -1) {
+      if ($scope.pageInfo?.tags?.toString().split(",").indexOf(suggest) != -1) {
         cls += " selected";
       }
       $("#suggest").append("<a href=\"#\" class=\"" + cls + "\">" + escapeHTML(suggest) + "</a>");
@@ -491,12 +489,12 @@ const renderSuggest = () => {
 };
 
 const addTag = (s: string) => {
-  const t = $scope.pageInfo.tag.trim();
+  const t = $scope.pageInfo?.tags?.join(" ");
   // skip if tag already added
-  if ($.inArray(s, t.split(" ")) === -1) {
-    $scope.pageInfo.tag = t + " " + s + " ";
+  if (t && $.inArray(s, t.split(" ")) === -1) {
+    $scope.pageInfo && ($scope.pageInfo.tags = (t + " " + s + " ").split(" "));
   }
-  $("#tag").val($scope.pageInfo.tag);
+  $("#tag").val($scope.pageInfo?.tags?.join(" ") as string);
 };
 
 const addTags = (tags: string[]) => {
@@ -514,15 +512,14 @@ const postSubmit = () => {
   renderError();
   renderLoading();
 
-  const info: any = {
-    url: $("#url").val(),
-    title: $("#title").val(),
-    desc: $("#desc").val(),
-    tag: $("#tag").val()
+  const info: PageInfo = {
+    url: $("#url").val() as string,
+    title: $("#title").val() as string,
+    description: $("#desc").val() as string,
+    tags: $("#tag").val()?.toString().split(" "),
   };
 
-  info.shared = $("#private").prop("checked") ? "no" : "yes";
-  info.toread = $("#toread").prop("checked") ? "yes" : "no";
+  info.isPrivate = $("#private").prop("checked");
   bg.addPost(info);
 };
 
@@ -537,7 +534,7 @@ const postDelete = () => {
   browser.tabs.query({ active: true, currentWindow: true })
     .then(tabs => {
       const tab = tabs[0];
-      bg.deletePost(tab.url);
+      bg.deletePost(tab.url as string);
   });
 };
 
