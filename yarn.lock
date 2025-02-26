@@ -1323,13 +1323,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chrome@npm:^0.0.287":
-  version: 0.0.287
-  resolution: "@types/chrome@npm:0.0.287"
+"@types/chrome@npm:^0.0.306":
+  version: 0.0.306
+  resolution: "@types/chrome@npm:0.0.306"
   dependencies:
     "@types/filesystem": "npm:*"
     "@types/har-format": "npm:*"
-  checksum: 10c0/3c3c3b9a1e79f0f92f2fc254971985517aba95d8bc1355cbae2309e9cb001cd961a2edde764b6b88a9189d3a496602db3329da6aad0a90aff600fca832bc88e4
+  checksum: 10c0/579cee45d88e1cdb6b7507c25efeea244068823a4813d0b794a51f92aabafc4b7cdeeebaf6a00a998b21b91939f1d99cbfeb590e734df802956c16a6f188fd8c
   languageName: node
   linkType: hard
 
@@ -5192,7 +5192,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "linkace-firefox@workspace:."
   dependencies:
-    "@types/chrome": "npm:^0.0.287"
+    "@types/chrome": "npm:^0.0.306"
     "@types/firefox-webext-browser": "npm:^120.0.4"
     "@types/jest": "npm:^29.5.14"
     "@types/jquery": "npm:^3.5.32"
