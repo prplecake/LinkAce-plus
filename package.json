@@ -30,7 +30,7 @@
     "jquery": "^3.7.1",
     "mini-css-extract-plugin": "^2.9.2",
     "sass": "^1.83.4",
-    "sass-loader": "^16.0.4",
+    "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",
     "stylelint": "^16.14.1",
     "stylelint-config-recommended": "^15.0.0",
