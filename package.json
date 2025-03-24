@@ -29,7 +29,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jquery": "^3.7.1",
     "mini-css-extract-plugin": "^2.9.2",
-    "sass": "^1.85.1",
+    "sass": "^1.86.0",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",
     "stylelint": "^16.16.0",
