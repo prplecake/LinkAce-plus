@@ -16,7 +16,7 @@
     "@types/chrome": "^0.0.313",
     "@types/firefox-webext-browser": "^120.0.4",
     "@types/jest": "^30.0.0",
-    "@types/jquery": "^3.5.32",
+    "@types/jquery": "^3.5.33",
     "@types/node": "^24.1.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^8.41.0",
